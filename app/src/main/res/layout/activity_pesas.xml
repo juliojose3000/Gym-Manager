@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/pesas"
+    tools:context=".activities.Pesas"
+    tools:layout_editor_absoluteY="73dp">
+
+    <ListView
+        android:id="@+id/listview_customers"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="74dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginStart="14dp"
+        app:layout_constraintBottom_toTopOf="@+id/button_add_pay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="34dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="56dp"
+        android:text="@string/customers_pesas"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/listview_customers"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button_customer_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="7dp"
+        android:onClick="connectWithDatabase"
+        android:text="@string/see_details_customer"
+        app:layout_constraintBaseline_toBaselineOf="@+id/button_add_pay"
+        app:layout_constraintEnd_toStartOf="@+id/button_add_pay"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/button_add_pay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="63dp"
+        android:text="@string/add_pay"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/button_customer_details"
+        app:layout_constraintTop_toBottomOf="@+id/listview_customers" />
+</android.support.constraint.ConstraintLayout>

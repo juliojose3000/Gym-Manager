@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Cachí Fitness Center</string>
+    <string name="gym_cachi_name">Cachí Fitness Center</string>
+    <string name="username">Nombre de usuario</string>
+    <string name="password">Contraseña</string>
+    <string name="button_accept">Aceptar</string>
+    <string name="button_cancel">Cancelar</string>
+    <string name="button_taebo">Taebo</string>
+    <string name="button_pesas">Pesas</string>
+    <string name="customers_pesas">Clientes:</string>
+    <string name="see_details_customer">Detalles:</string>
+    <string name="add_pay">Agregar pago:</string>
+</resources>
