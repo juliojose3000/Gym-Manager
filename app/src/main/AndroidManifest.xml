@@ -18,7 +18,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.Pesas"></activity>
+        <activity android:name=".activities.Pesas" android:parentActivityName=".MainActivity"/>
+        <activity android:name=".activities.AddCustomer" android:parentActivityName=".activities.AddCustomersToday"/>
+        <activity android:name=".activities.AddCustomersToday" android:parentActivityName=".activities.Pesas"></activity>
     </application>
 
 </manifest>

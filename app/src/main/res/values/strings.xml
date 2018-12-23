@@ -7,7 +7,24 @@
     <string name="button_cancel">Cancelar</string>
     <string name="button_taebo">Taebo</string>
     <string name="button_pesas">Pesas</string>
-    <string name="customers_pesas">Clientes:</string>
-    <string name="see_details_customer">Detalles:</string>
-    <string name="add_pay">Agregar pago:</string>
+
+    <!-- Pesas -->
+    <string name="customers_pesas">Clientes que han venido hoy:</string>
+    <string name="see_details_customer">Detalles</string>
+    <string name="add_pay">Agregar pago</string>
+    <string name="add_customer_today">Agregar cliente</string>
+
+    <!-- Add Customer -->
+    <string name="customer_name">Nombre</string>
+    <string name="customer_lastname">Apellidos</string>
+    <string name="customer_startdate">Fecha de inicio</string>
+    <string name="customer_nickname">Conocido como</string>
+
+    <!-- Menu -->
+    <string name="all_customers">Todos los clientes</string>
+    <string name="add_customer">Registrar nuevo cliente</string>
+
+    <!-- All customers -->
+    <string name="add_customers">Agregar clientes</string>
+
 </resources>

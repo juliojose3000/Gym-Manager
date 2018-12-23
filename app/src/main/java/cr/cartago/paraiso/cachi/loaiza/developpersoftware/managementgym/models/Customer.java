@@ -1,0 +1,56 @@
+package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models;
+
+import java.sql.Date;
+
+public class Customer {
+
+    private int customerId;
+
+    private String name;
+
+    private String lastName;
+
+    private String nickname;
+
+    private Date starDate;
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public Date getStarDate() {
+        return starDate;
+    }
+
+    public void setStarDate(Date starDate) {
+        this.starDate = starDate;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+}

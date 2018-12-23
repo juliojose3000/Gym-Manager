@@ -3,12 +3,11 @@ package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activit
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,16 +15,17 @@ import java.util.Calendar;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.ManagementDatabase;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.CustomerToday;
 
-public class Pesas extends Activity {
+public class AddCustomersToday extends Activity {
 
-
+    private ManagementDatabase managementDatabase;
 
     ListView listViewCustomers;
 
     ArrayList<Customer> listCustomers;
 
-    ManagementDatabase managementDatabase;
+    ArrayList<CustomerToday> listCustomersToday;
 
     private int year, month, dayOfMonth;
 
@@ -36,13 +36,20 @@ public class Pesas extends Activity {
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_pesas);
+        setContentView(R.layout.activity_add_customers_today);
 
-        listViewCustomers = findViewById(R.id.listview_come_customers);
+        listViewCustomers = findViewById(R.id.listview_customers);
+
+        managementDatabase = new ManagementDatabase();// Creo una nueva conexion
+
+        listCustomers = managementDatabase.addCustomerToday();
+
+        fillLisViewCustomers();
 
         listViewCustomers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
 
 
             }
@@ -57,15 +64,10 @@ public class Pesas extends Activity {
 
         dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
-        managementDatabase = new ManagementDatabase();
-
-        listCustomers = managementDatabase.getAllCustomersOfToday(year+"-"+month+"-"+dayOfMonth);
-
-        fillLisViewCustomers();
-
 
 
     }
+
 
     public void fillLisViewCustomers() {
 
@@ -76,9 +78,10 @@ public class Pesas extends Activity {
                 getNameAndLastNameFromListCustomer() );
 
         listViewCustomers.setAdapter(arrayAdapter);
-        listViewCustomers.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        listViewCustomers.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
     }
+
 
     private ArrayList<String> getNameAndLastNameFromListCustomer(){
 
@@ -95,43 +98,28 @@ public class Pesas extends Activity {
     }
 
 
-    //metodo para mostrar y ocultar el menu
-    public boolean onCreateOptionsMenu(Menu menu){
+    public void accept(View v){
 
-        getMenuInflater().inflate(R.menu.customer_menu, menu);
+        //Esta linea tan satanica lo que hace es, obtener todos los items seleccionados, luego solo dejo la posiciones de los items y los
+        //separo para almacenarlos en un arreglo.
+        String[] numbers = listViewCustomers.getCheckedItemPositions().toString().replaceAll("\\D+","").split("(?!^)");
 
-        return true;
+        String today = year+"-"+month+"-"+dayOfMonth;
 
-    }
+        for(int i = 0; i<numbers.length; i++){
+            //obtengo el cliente de la posicion seleccionada en la lista y obtengo su id
+            int customerId = listCustomers.get(Integer.parseInt(numbers[i])).getCustomerId();
 
-    public boolean onOptionsItemSelected(MenuItem item){
+            managementDatabase.insertCustomersOfToday(customerId, today);
 
-        int id = item.getItemId();
-
-        if(id == R.id.item_add_customer){
-            Intent i = new Intent(Pesas.this, AddCustomer.class);
-            startActivity(i);
         }
-        return super.onOptionsItemSelected(item);
-    }
 
+        Toast.makeText(this, "Se han agregado los clientes que han llegado hoy", Toast.LENGTH_LONG).show();
 
-    public void seeAllCustomers(View v){
-
-        Intent i = new Intent(Pesas.this, AddCustomersToday.class);
-
+        Intent i = new Intent(AddCustomersToday.this, Pesas.class);
         startActivity(i);
 
     }
-
-
-
-
-
-
-
-
-
 
 
 }
