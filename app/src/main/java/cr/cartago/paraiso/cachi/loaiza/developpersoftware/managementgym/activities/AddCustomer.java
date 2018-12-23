@@ -3,6 +3,7 @@ package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activit
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.MainActivity;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.ManagementDatabase;
 
@@ -70,7 +72,7 @@ public class AddCustomer extends Activity {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                customerStartdate.setText(year + "-" + month + "-" + dayOfMonth);
+                                customerStartdate.setText(year + "-" + (month+1) + "-" + dayOfMonth);
                             }
                         },year,month,dayOfMonth);
                         datePickerDialog.show();
@@ -101,6 +103,11 @@ public class AddCustomer extends Activity {
         String customerStartdate = this.customerStartdate.getText().toString();
 
         String customerNickname = this.customerNickname.getText().toString();
+
+        if(customerName.equals("") || customerLastname.equals("") || customerStartdate.equals("")){
+            Toast.makeText(this, "Solo el campo 'Conocido como' no es indispensable. Complete los demás.", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         boolean isInserted = managementDatabase.insertCustomer(customerName, customerLastname, customerNickname, customerStartdate);
 

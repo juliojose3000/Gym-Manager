@@ -54,8 +54,8 @@
 
     <ListView
         android:id="@+id/listview_come_customers"
-        android:layout_width="368dp"
-        android:layout_height="0dp"
+        android:layout_width="342dp"
+        android:layout_height="235dp"
         android:layout_marginBottom="56dp"
         android:layout_marginTop="52dp"
         app:layout_constraintBottom_toBottomOf="@+id/button_add_customer"

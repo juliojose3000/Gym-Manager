@@ -1,24 +1,33 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.sql.Date;
+import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.CustomerToday;
 
-public class ManagementDatabase {
+public final class ManagementDatabase{
 
     private CreateConnectionWithDatabase connectionDataBaseSQLServer;
 
     private Connection connection = null;
 
     private String notification;
+
+    private int year, month, dayOfMonth;
+
+    private Calendar calendar;
+
+    public static ArrayList<Customer> listAllCustomer;
+
+    public static ArrayList<Customer> listCustomersOfToday;
+
+    public static ArrayList<Customer> listCustomerForAddToday;
+
 
     public ManagementDatabase(){
 
@@ -41,6 +50,20 @@ public class ManagementDatabase {
             return;
 
         }
+
+        calendar = Calendar.getInstance();
+
+        year = calendar.get(Calendar.YEAR);
+
+        month = calendar.get(Calendar.MONTH)+1;
+
+        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        listAllCustomer = getAllCustomers();
+
+        listCustomersOfToday = getAllCustomersOfToday(year+"-"+month+"-"+dayOfMonth);
+
+        listCustomerForAddToday = customerForAddToday();
 
         verifyUser();
 
@@ -122,7 +145,6 @@ public class ManagementDatabase {
 
     }
 
-
     public ArrayList<Customer> getAllCustomers(){
 
         ArrayList<Customer> customers = new ArrayList<>();
@@ -170,9 +192,8 @@ public class ManagementDatabase {
 
     }
 
-
     //Este metodo carga solo los clientes que no han llegado hoy
-    public ArrayList<Customer> addCustomerToday(){
+    /*public ArrayList<Customer> addCustomerToday(String today){
 
         ArrayList<Customer> customers = new ArrayList<>();
 
@@ -193,7 +214,7 @@ public class ManagementDatabase {
                 int customerId = resultSet.getInt("customer_id");
 
                 //Si el cliente ya llego no se carga en la lista general
-                if(!thisCustomerArrivedToday(customerId)){
+                if(!thisCustomerArrivedToday(customerId, today)){
                     String customerName = resultSet.getString("customer_name");
                     String customerLastName = resultSet.getString("customer_lastname");
                     String startDate = resultSet.getString("start_date");
@@ -219,6 +240,32 @@ public class ManagementDatabase {
         }
 
         return customers;
+
+    }*/
+    public ArrayList<Customer> customerForAddToday(){
+
+        ArrayList<Customer> listCustomersForAddToday = new ArrayList<>();
+
+        for (Customer customer:
+             listAllCustomer) {
+            if(!contains(customer)){
+                listCustomersForAddToday.add(customer);
+            }
+        }
+
+        return listCustomersForAddToday;
+
+    }
+
+    private boolean contains(Customer customerToSearh){
+
+        for (Customer customer:
+             listCustomersOfToday) {
+                if(customer.getCustomerId()==customerToSearh.getCustomerId()){
+                    return true;
+                }
+        }
+        return false;
 
     }
 
@@ -326,11 +373,11 @@ public class ManagementDatabase {
     }
 
     //Me dice si hoy a llegado el cliente con el id tal
-    public boolean thisCustomerArrivedToday(int customerId){
+    public boolean thisCustomerArrivedToday(int customerId, String today){
 
         String tableName = "customertoday";
 
-        String query = "SELECT* FROM "+tableName+" WHERE customer_id='"+customerId+"'";
+        String query = "SELECT* FROM "+tableName+" WHERE customer_id="+customerId+" AND date_arrived='"+today+"'";
 
         try {
             //prepara la conexion;'

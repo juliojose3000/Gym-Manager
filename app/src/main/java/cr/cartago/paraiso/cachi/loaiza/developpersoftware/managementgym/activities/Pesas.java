@@ -13,6 +13,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.MainActivity;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.ManagementDatabase;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
@@ -53,17 +54,21 @@ public class Pesas extends Activity {
 
         year = calendar.get(Calendar.YEAR);
 
-        month = calendar.get(Calendar.MONTH);
+        month = calendar.get(Calendar.MONTH)+1;
 
         dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
-        managementDatabase = new ManagementDatabase();
+        listCustomers = new ArrayList<>();
 
-        listCustomers = managementDatabase.getAllCustomersOfToday(year+"-"+month+"-"+dayOfMonth);
+        listCustomers = ManagementDatabase.listCustomersOfToday;
 
         fillLisViewCustomers();
 
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
 
     }
 
@@ -111,7 +116,12 @@ public class Pesas extends Activity {
         if(id == R.id.item_add_customer){
             Intent i = new Intent(Pesas.this, AddCustomer.class);
             startActivity(i);
+        }else if(id == R.id.item_all_customers) {
+            Intent i = new Intent(Pesas.this, AllCustomers.class);
+            startActivity(i);
+
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -122,6 +132,12 @@ public class Pesas extends Activity {
 
         startActivity(i);
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(Pesas.this, MainActivity.class);
+        startActivity(i);
     }
 
 

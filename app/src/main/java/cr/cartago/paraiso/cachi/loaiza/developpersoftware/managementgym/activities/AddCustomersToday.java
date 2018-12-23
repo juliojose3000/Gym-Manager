@@ -21,15 +21,15 @@ public class AddCustomersToday extends Activity {
 
     private ManagementDatabase managementDatabase;
 
-    ListView listViewCustomers;
+    private ListView listViewCustomers;
 
-    ArrayList<Customer> listCustomers;
-
-    ArrayList<CustomerToday> listCustomersToday;
+    private ArrayList<Customer> listCustomers;
 
     private int year, month, dayOfMonth;
 
     private Calendar calendar;
+
+    private boolean[] itemsChecked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +42,17 @@ public class AddCustomersToday extends Activity {
 
         managementDatabase = new ManagementDatabase();// Creo una nueva conexion
 
-        listCustomers = managementDatabase.addCustomerToday();
+        calendar = Calendar.getInstance();
+
+        year = calendar.get(Calendar.YEAR);
+
+        month = calendar.get(Calendar.MONTH)+1;
+
+        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        listCustomers = ManagementDatabase.listCustomerForAddToday;
+
+        itemsChecked = new boolean[listCustomers.size()];
 
         fillLisViewCustomers();
 
@@ -50,20 +60,16 @@ public class AddCustomersToday extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                if(!itemsChecked[position]){
+                    itemsChecked[position] = true;
+                }else{
+                    itemsChecked[position] = false;
+                }
 
 
             }
 
         });
-
-        calendar = Calendar.getInstance();
-
-        year = calendar.get(Calendar.YEAR);
-
-        month = calendar.get(Calendar.MONTH);
-
-        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-
 
 
     }
@@ -98,11 +104,16 @@ public class AddCustomersToday extends Activity {
     }
 
 
-    public void accept(View v){
+    /*public void accept(View v){
 
         //Esta linea tan satanica lo que hace es, obtener todos los items seleccionados, luego solo dejo la posiciones de los items y los
         //separo para almacenarlos en un arreglo.
         String[] numbers = listViewCustomers.getCheckedItemPositions().toString().replaceAll("\\D+","").split("(?!^)");
+
+        if(numbers[0].equals("")){//Significa que no ha seleccionado ningun cliente
+            Toast.makeText(this, "Seleccione al menos un cliente", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         String today = year+"-"+month+"-"+dayOfMonth;
 
@@ -119,7 +130,44 @@ public class AddCustomersToday extends Activity {
         Intent i = new Intent(AddCustomersToday.this, Pesas.class);
         startActivity(i);
 
+    }*/
+
+
+    public void accept(View v){
+
+        if(areAllFalse()){
+            Toast.makeText(this, "Seleccione al menos un cliente", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        for(int i = 0; i<listCustomers.size(); i++){
+
+            if(itemsChecked[i]){
+                String today = year+"-"+month+"-"+dayOfMonth;
+                //obtengo el cliente de la posicion seleccionada en la lista y obtengo su id
+                int customerId = listCustomers.get(i).getCustomerId();
+
+                managementDatabase.insertCustomersOfToday(customerId, today);
+            }
+
+        }
+
+        Toast.makeText(this, "Se han agregado los clientes que han llegado hoy", Toast.LENGTH_LONG).show();
+
+        Intent i = new Intent(AddCustomersToday.this, Pesas.class);
+        startActivity(i);
+
     }
+
+
+
+    public boolean areAllFalse()
+    {
+        for(boolean b : itemsChecked) if(b) return false;
+        return true;
+    }
+
+
 
 
 }
