@@ -27,4 +27,9 @@
     <!-- All customers -->
     <string name="add_customers">Agregar clientes</string>
 
+    <!-- Add payment -->
+    <string name="add_day_payment">Día</string>
+    <string name="add_week_payment">Semana</string>
+    <string name="add_month_payment">Mes</string>
+
 </resources>

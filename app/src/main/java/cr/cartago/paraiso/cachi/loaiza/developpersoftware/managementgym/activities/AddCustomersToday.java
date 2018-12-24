@@ -13,9 +13,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.ManagementDatabase;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.CustomerToday;
 
 public class AddCustomersToday extends Activity {
 
@@ -148,6 +147,7 @@ public class AddCustomersToday extends Activity {
                 int customerId = listCustomers.get(i).getCustomerId();
 
                 managementDatabase.insertCustomersOfToday(customerId, today);
+                ManagementDatabase.listCustomersOfToday.add(listCustomers.get(i));
             }
 
         }

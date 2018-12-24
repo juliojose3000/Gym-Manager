@@ -20,17 +20,18 @@
         </activity>
         <activity
             android:name=".activities.Pesas"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".activities.AddCustomer"
-            android:parentActivityName=".activities.AddCustomersToday"/>
+            android:parentActivityName=".activities.AddCustomersToday" />
         <activity
             android:name=".activities.AddCustomersToday"
-            android:parentActivityName=".activities.Pesas"/>
-        <activity android:name=".activities.AllCustomers"
+            android:parentActivityName=".activities.Pesas" />
+        <activity
+            android:name=".activities.AllCustomers"
             android:launchMode="singleTop"
-            android:parentActivityName=".activities.Pesas">
-        </activity>
+            android:parentActivityName=".activities.Pesas"></activity>
+        <activity android:name=".activities.AddPayment"></activity>
     </application>
 
 </manifest>

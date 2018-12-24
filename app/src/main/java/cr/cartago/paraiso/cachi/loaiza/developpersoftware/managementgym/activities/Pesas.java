@@ -9,13 +9,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.MainActivity;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.ManagementDatabase;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
 public class Pesas extends Activity {
@@ -31,6 +32,8 @@ public class Pesas extends Activity {
     private int year, month, dayOfMonth;
 
     private Calendar calendar;
+
+    private Customer customerCurrentSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +64,16 @@ public class Pesas extends Activity {
         listCustomers = new ArrayList<>();
 
         listCustomers = ManagementDatabase.listCustomersOfToday;
+
+        listViewCustomers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            customerCurrentSelected = listCustomers.get(position);
+
+            }
+
+        });
 
         fillLisViewCustomers();
 
@@ -129,6 +142,24 @@ public class Pesas extends Activity {
     public void seeAllCustomers(View v){
 
         Intent i = new Intent(Pesas.this, AddCustomersToday.class);
+
+        startActivity(i);
+
+    }
+
+
+    public void addPayment(View v){
+
+        if(customerCurrentSelected==null){
+            Toast.makeText(this,"Seleccione un cliente",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Intent i = new Intent(Pesas.this, AddPayment.class);
+
+        i.putExtra("customer_name", customerCurrentSelected.getName()+" "+customerCurrentSelected.getLastName());
+
+        i.putExtra("customer_id", customerCurrentSelected.getCustomerId());
 
         startActivity(i);
 

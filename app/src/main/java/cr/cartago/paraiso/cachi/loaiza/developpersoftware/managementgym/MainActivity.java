@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activities.Pesas;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.ManagementDatabase;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 
 public class MainActivity extends Activity {
 

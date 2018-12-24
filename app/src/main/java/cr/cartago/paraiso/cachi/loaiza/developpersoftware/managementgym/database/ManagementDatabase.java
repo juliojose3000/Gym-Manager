@@ -1,4 +1,4 @@
-package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data;
+package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
 public final class ManagementDatabase{
@@ -28,10 +29,14 @@ public final class ManagementDatabase{
 
     public static ArrayList<Customer> listCustomerForAddToday;
 
+    private CustomerData customerData;
+
 
     public ManagementDatabase(){
 
         connectionDataBaseSQLServer = new CreateConnectionWithDatabase();
+
+        customerData = new CustomerData();
 
         try {
             connection = connectionDataBaseSQLServer.createConnection("julio@loaiza-server","123Loaiza", "gym_cachi","loaiza-server.mysql.database.azure.com:3306");
@@ -63,7 +68,7 @@ public final class ManagementDatabase{
 
         listCustomersOfToday = getAllCustomersOfToday(year+"-"+month+"-"+dayOfMonth);
 
-        listCustomerForAddToday = customerForAddToday();
+        listCustomerForAddToday = customerData.customerForAddToday();
 
         verifyUser();
 
@@ -242,32 +247,6 @@ public final class ManagementDatabase{
         return customers;
 
     }*/
-    public ArrayList<Customer> customerForAddToday(){
-
-        ArrayList<Customer> listCustomersForAddToday = new ArrayList<>();
-
-        for (Customer customer:
-             listAllCustomer) {
-            if(!contains(customer)){
-                listCustomersForAddToday.add(customer);
-            }
-        }
-
-        return listCustomersForAddToday;
-
-    }
-
-    private boolean contains(Customer customerToSearh){
-
-        for (Customer customer:
-             listCustomersOfToday) {
-                if(customer.getCustomerId()==customerToSearh.getCustomerId()){
-                    return true;
-                }
-        }
-        return false;
-
-    }
 
     public boolean insertCustomer(String customerName, String customerLastname, String customerNickname, String customerStartdate){
 

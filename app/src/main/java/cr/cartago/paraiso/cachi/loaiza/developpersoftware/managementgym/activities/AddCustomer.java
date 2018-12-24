@@ -2,8 +2,6 @@ package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activit
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -13,9 +11,8 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.MainActivity;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.ManagementDatabase;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 
 public class AddCustomer extends Activity {
 
@@ -110,6 +107,12 @@ public class AddCustomer extends Activity {
         }
 
         boolean isInserted = managementDatabase.insertCustomer(customerName, customerLastname, customerNickname, customerStartdate);
+
+        new Thread(new Runnable() {//Refresco todas las listas
+            public void run() {
+                managementDatabase = new ManagementDatabase();
+            }
+        }).start();
 
         String notification;
 
