@@ -9,10 +9,12 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.sql.Date;
 import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
 public class AddCustomer extends Activity {
 
@@ -32,8 +34,6 @@ public class AddCustomer extends Activity {
 
     private Calendar calendar;
 
-    private ManagementDatabase managementDatabase;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -50,8 +50,6 @@ public class AddCustomer extends Activity {
         customerStartdate = findViewById(R.id.editText_customer_startdate);
 
         buttonAccept = findViewById(R.id.button_accept);
-
-        managementDatabase = new ManagementDatabase();
 
         customerStartdate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,26 +91,28 @@ public class AddCustomer extends Activity {
 
     public void addCustomer(View v){
 
-        String customerName = this.customerName.getText().toString();
+        final String customerName = this.customerName.getText().toString();
 
-        String customerLastname = this.customerLastname.getText().toString();
+        final String customerLastname = this.customerLastname.getText().toString();
 
-        String customerStartdate = this.customerStartdate.getText().toString();
+        final String customerStartdate = this.customerStartdate.getText().toString();
 
-        String customerNickname = this.customerNickname.getText().toString();
+        final String customerNickname = this.customerNickname.getText().toString();
 
         if(customerName.equals("") || customerLastname.equals("") || customerStartdate.equals("")){
             Toast.makeText(this, "Solo el campo 'Conocido como' no es indispensable. Complete los demás.", Toast.LENGTH_LONG).show();
             return;
         }
 
-        boolean isInserted = managementDatabase.insertCustomer(customerName, customerLastname, customerNickname, customerStartdate);
-
-        new Thread(new Runnable() {//Refresco todas las listas
+        new Thread(new Runnable() {
             public void run() {
-                managementDatabase = new ManagementDatabase();
+                ManagementDatabase.listAllCustomer.add(new Customer(customerName, customerLastname, customerNickname, Date.valueOf(customerStartdate)));
+                ManagementDatabase.listCustomerForAddToday.add(new Customer(customerName, customerLastname, customerNickname, Date.valueOf(customerStartdate)));
+
             }
         }).start();
+
+        boolean isInserted = ManagementDatabase.insertCustomer(customerName, customerLastname, customerNickname, customerStartdate);
 
         String notification;
 

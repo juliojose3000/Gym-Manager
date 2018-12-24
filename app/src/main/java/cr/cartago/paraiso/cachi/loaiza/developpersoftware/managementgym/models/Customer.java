@@ -14,6 +14,16 @@ public class Customer {
 
     private Date starDate;
 
+    public Customer(String name, String lastName, String nickname, Date starDate) {
+        this.name = name;
+        this.lastName = lastName;
+        this.nickname = nickname;
+        this.starDate = starDate;
+    }
+
+    public Customer() {
+    }
+
     public int getCustomerId() {
         return customerId;
     }

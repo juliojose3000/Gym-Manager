@@ -13,9 +13,9 @@ import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.C
 
 public final class ManagementDatabase{
 
-    private CreateConnectionWithDatabase connectionDataBaseSQLServer;
+    private static CreateConnectionWithDatabase createConnectionWithDatabase;
 
-    private Connection connection = null;
+    private static Connection connection = null;
 
     private String notification;
 
@@ -34,12 +34,12 @@ public final class ManagementDatabase{
 
     public ManagementDatabase(){
 
-        connectionDataBaseSQLServer = new CreateConnectionWithDatabase();
+        createConnectionWithDatabase = new CreateConnectionWithDatabase();
 
         customerData = new CustomerData();
 
         try {
-            connection = connectionDataBaseSQLServer.createConnection("julio@loaiza-server","123Loaiza", "gym_cachi","loaiza-server.mysql.database.azure.com:3306");
+            connection = createConnectionWithDatabase.createConnection("julio@loaiza-server","123Loaiza", "gym_cachi","loaiza-server.mysql.database.azure.com:3306");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
@@ -197,58 +197,7 @@ public final class ManagementDatabase{
 
     }
 
-    //Este metodo carga solo los clientes que no han llegado hoy
-    /*public ArrayList<Customer> addCustomerToday(String today){
-
-        ArrayList<Customer> customers = new ArrayList<>();
-
-        String tableName = "customer";
-
-        String query = "SELECT* FROM "+tableName;
-
-        try {
-            //prepara la conexion;'
-            Statement statement = connection.createStatement();
-            //ejecuta el query
-            ResultSet resultSet = statement.executeQuery(query);
-
-            Customer customer;
-
-            //pregunta si la consulta trajo resultados.
-            while(resultSet.next()){
-                int customerId = resultSet.getInt("customer_id");
-
-                //Si el cliente ya llego no se carga en la lista general
-                if(!thisCustomerArrivedToday(customerId, today)){
-                    String customerName = resultSet.getString("customer_name");
-                    String customerLastName = resultSet.getString("customer_lastname");
-                    String startDate = resultSet.getString("start_date");
-                    String customerNickname = resultSet.getString("customer_nickname");
-
-                    customer = new Customer();
-
-                    customer.setCustomerId(customerId);
-                    customer.setName(customerName);
-                    customer.setLastName(customerLastName);
-                    customer.setStarDate(Date.valueOf(startDate));
-                    customer.setNickname(customerNickname);
-
-                    customers.add(customer);
-                }
-
-            }
-
-        } catch (SQLException e) {
-
-            String msj =  "Error al conectar con la base de datos. Verifique la coneccion.";
-
-        }
-
-        return customers;
-
-    }*/
-
-    public boolean insertCustomer(String customerName, String customerLastname, String customerNickname, String customerStartdate){
+    public static boolean insertCustomer(String customerName, String customerLastname, String customerNickname, String customerStartdate){
 
         String query = "INSERT INTO customer(customer_name,customer_lastname,start_date, customer_nickname) VALUES ('"+customerName+"','"+customerLastname+"','"+customerStartdate+"','"+customerNickname+"');";
 
@@ -270,7 +219,7 @@ public final class ManagementDatabase{
 
     }
 
-    public boolean insertCustomersOfToday(int customerId, String today){
+    public static boolean insertCustomersOfToday(int customerId, String today){
 
         String query = "INSERT INTO customertoday(customer_id, date_arrived) values ("+customerId+",'"+today+"');";
 
@@ -326,7 +275,7 @@ public final class ManagementDatabase{
                     String startDate = resultSet2.getString("start_date");
                     String customerNickname = resultSet2.getString("customer_nickname");
 
-                    customer = new Customer();
+                    customer = new Customer(customerName, customerLastName, customerNickname, Date.valueOf(startDate));
 
                     customer.setCustomerId(customerId);
                     customer.setName(customerName);
@@ -351,32 +300,29 @@ public final class ManagementDatabase{
 
     }
 
-    //Me dice si hoy a llegado el cliente con el id tal
-    public boolean thisCustomerArrivedToday(int customerId, String today){
+    public static boolean addPaymentFromCustomer(int customerId, String datePayment, String endDatePayment, String amuntTime) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
 
-        String tableName = "customertoday";
+        connection = createConnectionWithDatabase.createConnection("julio@loaiza-server","123Loaiza", "gym_cachi","loaiza-server.mysql.database.azure.com:3306");
 
-        String query = "SELECT* FROM "+tableName+" WHERE customer_id="+customerId+" AND date_arrived='"+today+"'";
+        String query = "INSERT INTO customer_pay(customer_id, pay_date, pay_end, amount_time) VALUES ("+customerId+",'"+datePayment+"','"+endDatePayment+"','"+amuntTime+"');";
 
         try {
             //prepara la conexion;'
             Statement statement = connection.createStatement();
             //ejecuta el query
-            ResultSet resultSet = statement.executeQuery(query);
+            int rowsAffeted = statement.executeUpdate(query);
 
-
-            //pregunta si la consulta trajo resultados.
-            if(resultSet.next()){
+            if(rowsAffeted==1){//significa que hubo un cambio en la base de datos
                 return true;
             }
+
         } catch (SQLException e) {
-
-            String msj =  "Error al conectar con la base de datos. Verifique la coneccion.";
-
+            e.printStackTrace();
         }
 
         return false;
 
     }
+
 
 }

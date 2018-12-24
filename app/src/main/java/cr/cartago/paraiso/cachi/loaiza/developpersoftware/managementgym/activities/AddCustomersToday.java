@@ -18,8 +18,6 @@ import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.C
 
 public class AddCustomersToday extends Activity {
 
-    private ManagementDatabase managementDatabase;
-
     private ListView listViewCustomers;
 
     private ArrayList<Customer> listCustomers;
@@ -38,8 +36,6 @@ public class AddCustomersToday extends Activity {
         setContentView(R.layout.activity_add_customers_today);
 
         listViewCustomers = findViewById(R.id.listview_customers);
-
-        managementDatabase = new ManagementDatabase();// Creo una nueva conexion
 
         calendar = Calendar.getInstance();
 
@@ -146,7 +142,7 @@ public class AddCustomersToday extends Activity {
                 //obtengo el cliente de la posicion seleccionada en la lista y obtengo su id
                 int customerId = listCustomers.get(i).getCustomerId();
 
-                managementDatabase.insertCustomersOfToday(customerId, today);
+                ManagementDatabase.insertCustomersOfToday(customerId, today);
                 ManagementDatabase.listCustomersOfToday.add(listCustomers.get(i));
             }
 
