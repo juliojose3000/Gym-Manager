@@ -9,4 +9,12 @@
         android:id="@+id/item_all_customers"
         android:title="@string/all_customers" />
 
+    <item
+        android:id="@+id/item_all_defaulter"
+        android:title="@string/all_defaulter" />
+
+    <item
+        android:id="@+id/item_current_payments"
+        android:title="@string/current_payments" />
+
 </menu>

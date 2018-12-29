@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ConnectionServer;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 
 public class AddPayment extends Activity {
@@ -33,6 +35,8 @@ public class AddPayment extends Activity {
 
     private Calendar calendar;
 
+    private ManagementDatabase managementDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -48,11 +52,11 @@ public class AddPayment extends Activity {
 
         calendar = Calendar.getInstance();
 
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
+
         year = calendar.get(Calendar.YEAR);
 
         month = calendar.get(Calendar.MONTH)+1;
-
-        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
         textView_customerName = findViewById(R.id.textView_payment_customer);
 
@@ -60,34 +64,55 @@ public class AddPayment extends Activity {
 
         textView_customerName.setText("Agregar un pago a "+customerName);
 
+        managementDatabase = new ManagementDatabase();
+
     }
 
 
     public void day(View v){
 
-        paymentDetails = "Cliente: "+customerName+"\nFecha de pago: "+dayOfMonth+"-"+month+"-"+year+"\nDuración: un día";
+        duracion = "un día";
+
+        Calendar calendar = Calendar.getInstance();
+
+        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        paymentDetails = "Cliente: "+customerName+"\nFecha de pago: "+dayOfMonth+"-"+month+"-"+year+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
     }
 
     public void week(View v){
+
         duracion = "una semana";
-        setDetails(7);
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+
+        endYear = calendar.get(Calendar.YEAR);
+
+        endMonth = calendar.get(Calendar.MONTH)+1;
+
+        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)+1;
+
+        endDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)+7;
+
+        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+dayOfMonth+"-"+month+"-"+year+"\nhasta el: "+endDayOfMonth+"-"+endMonth+"-"+endYear+"\nDuración: "+duracion;
+
+        textView_paymentDetails.setText(paymentDetails);
 
     }
 
     public void month(View v){
+
         duracion = "un mes";
-        setDetails(30);
-
-    }
-
-    private void setDetails(int noOfDays){
 
         Calendar calendar = Calendar.getInstance();
 
-        calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
+        //calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
 
         endYear = calendar.get(Calendar.YEAR);
 
@@ -95,11 +120,14 @@ public class AddPayment extends Activity {
 
         endDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
-        paymentDetails = "Cliente: "+customerName+"\nFecha de pago: "+dayOfMonth+"-"+month+"-"+year+"\nCubre hasta el: "+endDayOfMonth+"-"+endMonth+"-"+endYear+"\nDuración: "+duracion;
+        dayOfMonth  = 1;
+
+        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+dayOfMonth+"-"+month+"-"+year+"\nhasta el: "+endDayOfMonth+"-"+endMonth+"-"+endYear+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
     }
+
 
     public void cancel(View v){
         Intent i = new Intent(AddPayment.this, Pesas.class);
@@ -110,26 +138,35 @@ public class AddPayment extends Activity {
 
         boolean isInserted = false;
 
-        try {
-            isInserted = ManagementDatabase.addPaymentFromCustomer(customerId, year+"-"+month+"-"+dayOfMonth, endYear+"-"+endMonth+"-"+endDayOfMonth, duracion);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){
+            try {
+                isInserted = managementDatabase.addPaymentFromCustomer(customerId, year+"-"+month+"-"+dayOfMonth, endYear+"-"+endMonth+"-"+endDayOfMonth, duracion);
+                ManagementDatabase.listAllCustomerWithCurrentPayment.add(CustomerData.getCustomerById(customerId));
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            String notification;
 
-        String notification;
-
-        if(isInserted){
-            notification = "Se ha registrado el pago correctamente";
+            if(isInserted){
+                notification = "Se ha registrado el pago correctamente";
+            }else{
+                notification = "Hubo un proble al registrar el pago. Contacte a su técnico";
+            }
+            Toast.makeText(this, notification, Toast.LENGTH_LONG).show();
         }else{
-            notification = "Hubo un proble al registrar el pago. Contacte a su técnico";
+            Toast.makeText(this, customerName+" tiene un pago todavía vigente", Toast.LENGTH_LONG).show();
         }
-        Toast.makeText(this, notification, Toast.LENGTH_LONG).show();
+
+
+
+
+
 
     }
 

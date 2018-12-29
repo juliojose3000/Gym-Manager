@@ -27,6 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginStart="64dp"
+        android:onClick="seeDetailsCustomer"
         android:text="@string/see_details_customer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

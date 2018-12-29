@@ -23,6 +23,8 @@
     <!-- Menu -->
     <string name="all_customers">Todos los clientes</string>
     <string name="add_customer">Registrar nuevo cliente</string>
+    <string name="all_defaulter">Morosos</string>
+    <string name="current_payments">Pagos vigentes</string>
 
     <!-- All customers -->
     <string name="add_customers">Agregar clientes</string>
@@ -31,5 +33,11 @@
     <string name="add_day_payment">Día</string>
     <string name="add_week_payment">Semana</string>
     <string name="add_month_payment">Mes</string>
+
+    <!-- See customer details -->
+    <string name="see_customer_details">Detalles del cliente: </string>
+
+    <!-- See defaulter customers -->
+    <string name="defaulter_customers">Clientes morosos: </string>
 
 </resources>

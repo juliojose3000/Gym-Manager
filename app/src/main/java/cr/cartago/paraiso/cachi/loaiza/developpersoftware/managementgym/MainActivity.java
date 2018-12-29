@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import java.sql.SQLException;
+
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activities.Pesas;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 
@@ -33,6 +35,7 @@ public class MainActivity extends Activity {
         new Thread(new Runnable() {
             public void run() {
                 managementDatabase = new ManagementDatabase();
+                managementDatabase.fillAllList();
                 aux = true;
             }
         }).start();

@@ -57,6 +57,9 @@ public class Customer {
     }
 
     public String getNickname() {
+        if(nickname==null){
+            return "";
+        }
         return nickname;
     }
 

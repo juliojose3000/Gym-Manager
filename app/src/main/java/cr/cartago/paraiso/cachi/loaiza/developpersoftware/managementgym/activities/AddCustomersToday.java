@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.PaymentData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
@@ -20,13 +22,15 @@ public class AddCustomersToday extends Activity {
 
     private ListView listViewCustomers;
 
-    private ArrayList<Customer> listCustomers;
+    private ArrayList<Customer> listCustomersForAddToday;
 
     private int year, month, dayOfMonth;
 
     private Calendar calendar;
 
     private boolean[] itemsChecked;
+
+    private ManagementDatabase managementDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +49,9 @@ public class AddCustomersToday extends Activity {
 
         dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
-        listCustomers = ManagementDatabase.listCustomerForAddToday;
+        listCustomersForAddToday = ManagementDatabase.listCustomerForAddToday;
 
-        itemsChecked = new boolean[listCustomers.size()];
+        itemsChecked = new boolean[listCustomersForAddToday.size()];
 
         fillLisViewCustomers();
 
@@ -66,6 +70,7 @@ public class AddCustomersToday extends Activity {
 
         });
 
+        managementDatabase = new ManagementDatabase();
 
     }
 
@@ -88,7 +93,7 @@ public class AddCustomersToday extends Activity {
 
         ArrayList<String> listNamesAndLastNames = new ArrayList<>();
 
-        for (Customer customer:listCustomers) {
+        for (Customer customer:listCustomersForAddToday) {
 
             listNamesAndLastNames.add(customer.getName()+" "+customer.getLastName());
 
@@ -130,21 +135,37 @@ public class AddCustomersToday extends Activity {
 
     public void accept(View v){
 
+        ArrayList<Integer> customersId = new ArrayList<>();
+
         if(areAllFalse()){
             Toast.makeText(this, "Seleccione al menos un cliente", Toast.LENGTH_LONG).show();
             return;
         }
 
-        for(int i = 0; i<listCustomers.size(); i++){
+        for(int i = 0; i<listCustomersForAddToday.size(); i++){
 
             if(itemsChecked[i]){
                 String today = year+"-"+month+"-"+dayOfMonth;
                 //obtengo el cliente de la posicion seleccionada en la lista y obtengo su id
-                int customerId = listCustomers.get(i).getCustomerId();
+                int customerId = listCustomersForAddToday.get(i).getCustomerId();
+                customersId.add(customerId);
 
-                ManagementDatabase.insertCustomersOfToday(customerId, today);
-                ManagementDatabase.listCustomersOfToday.add(listCustomers.get(i));
+                managementDatabase.insertCustomersOfToday(customerId, today);
+
+                if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){
+                    managementDatabase.addCustomerDefaulter(customerId, today);//si el cliente ha llegado y no tiene un pago vigente que lo cubra, se agrega a morosos
+                    ManagementDatabase.listDefaulterCustomers.add(listCustomersForAddToday.get(i));
+                }
+                ManagementDatabase.listCustomersOfToday.add(listCustomersForAddToday.get(i));
+
+
             }
+
+        }
+
+        for(int i = 0; i<customersId.size(); i++){
+
+            ManagementDatabase.listCustomerForAddToday.remove(CustomerData.getCustomerById(customersId.get(i)));
 
         }
 

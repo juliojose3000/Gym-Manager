@@ -34,6 +34,8 @@ public class AddCustomer extends Activity {
 
     private Calendar calendar;
 
+    private ManagementDatabase managementDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -75,6 +77,8 @@ public class AddCustomer extends Activity {
 
         });
 
+        managementDatabase = new ManagementDatabase();
+
     }
 
     public void cancel(View v){
@@ -112,7 +116,7 @@ public class AddCustomer extends Activity {
             }
         }).start();
 
-        boolean isInserted = ManagementDatabase.insertCustomer(customerName, customerLastname, customerNickname, customerStartdate);
+        boolean isInserted = managementDatabase.insertCustomer(customerName, customerLastname, customerNickname, customerStartdate);
 
         String notification;
 

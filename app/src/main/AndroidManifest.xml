@@ -30,8 +30,10 @@
         <activity
             android:name=".activities.AllCustomers"
             android:launchMode="singleTop"
-            android:parentActivityName=".activities.Pesas"></activity>
-        <activity android:name=".activities.AddPayment"></activity>
+            android:parentActivityName=".activities.Pesas" />
+        <activity android:name=".activities.AddPayment" />
+        <activity android:name=".activities.SeeDetailsCustomer" />
+        <activity android:name=".activities.Morosos"></activity>
     </application>
 
 </manifest>
