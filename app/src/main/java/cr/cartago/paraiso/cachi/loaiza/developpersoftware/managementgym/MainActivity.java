@@ -17,7 +17,7 @@ public class MainActivity extends Activity {
 
     EditText editText_username;
 
-    ManagementDatabase managementDatabase;
+    public static ManagementDatabase managementDatabase;
 
     boolean aux = false;
 

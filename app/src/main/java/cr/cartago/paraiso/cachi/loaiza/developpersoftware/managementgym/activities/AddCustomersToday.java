@@ -14,7 +14,6 @@ import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.PaymentData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
@@ -154,13 +153,8 @@ public class AddCustomersToday extends Activity {
 
                 if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){
                     managementDatabase.addCustomerDefaulter(customerId, today);//si el cliente ha llegado y no tiene un pago vigente que lo cubra, se agrega a morosos
-                    ManagementDatabase.listDefaulterCustomers.add(listCustomersForAddToday.get(i));
                 }
-                ManagementDatabase.listCustomersOfToday.add(listCustomersForAddToday.get(i));
-
-
             }
-
         }
 
         for(int i = 0; i<customersId.size(); i++){
@@ -168,6 +162,8 @@ public class AddCustomersToday extends Activity {
             ManagementDatabase.listCustomerForAddToday.remove(CustomerData.getCustomerById(customersId.get(i)));
 
         }
+
+        managementDatabase.fillAllList();
 
         Toast.makeText(this, "Se han agregado los clientes que han llegado hoy", Toast.LENGTH_LONG).show();
 

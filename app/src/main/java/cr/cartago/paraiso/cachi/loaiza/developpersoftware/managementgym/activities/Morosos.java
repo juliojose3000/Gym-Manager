@@ -1,11 +1,13 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -20,7 +22,7 @@ public class Morosos extends Activity {
 
     private ArrayList<Customer> customers;
 
-
+    private Customer customerSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,17 +33,19 @@ public class Morosos extends Activity {
 
         listView_defaulterCustomers = findViewById(R.id.listview_defaulterCustomers);
 
+        customers = ManagementDatabase.listAllDefaulterCustomers;
+
         listView_defaulterCustomers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-
+            customerSelected = customers.get(position);
 
             }
 
         });
 
-        customers = ManagementDatabase.listDefaulterCustomers;
+
 
         fillLisViewCustomers();
     }
@@ -53,10 +57,25 @@ public class Morosos extends Activity {
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_checked,
-                CustomerData.getNameAndLastNameFromListCustomer(customers) );
+                CustomerData.getAllDefaulters());
 
         listView_defaulterCustomers.setAdapter(arrayAdapter);
         listView_defaulterCustomers.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+    }
+
+
+    public void detailsBillToPay(View v){
+
+        if(customerSelected==null){
+            Toast.makeText(this,"Seleccione un cliente", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Intent i = new Intent(Morosos.this, CustomerBillToPay.class);
+        i.putExtra("customer_id", customerSelected.getCustomerId());
+        i.putExtra("customer_name", customerSelected.getName()+" "+customerSelected.getLastName());
+        startActivity(i);
 
     }
 

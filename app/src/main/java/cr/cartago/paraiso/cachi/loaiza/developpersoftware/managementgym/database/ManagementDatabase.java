@@ -30,7 +30,9 @@ public class ManagementDatabase{
 
     public static ArrayList<Customer> listCustomerForAddToday;
 
-    public static ArrayList<Customer> listDefaulterCustomers;
+    public static ArrayList<Customer> listAllDefaulterCustomers;
+
+    public static ArrayList<String> listAllBillToPay;
 
     public static ArrayList<Customer> listAllCustomerWithCurrentPayment;
 
@@ -81,7 +83,7 @@ public class ManagementDatabase{
 
         listCustomerForAddToday = customerData.customerForAddToday();
 
-        listDefaulterCustomers = getAllDefaulter();
+        listAllDefaulterCustomers = getAllDefaulterCustomers();
 
         listAllCustomerWithCurrentPayment = getAllCustomersWithCurrentPayment(year+"-"+month+"-"+dayOfMonth);
 
@@ -349,11 +351,14 @@ public class ManagementDatabase{
 
     }
 
-    public ArrayList<Customer> getAllDefaulter(){
+    public ArrayList<Customer> getAllDefaulterCustomers(){
 
         ArrayList<Customer> customers = new ArrayList<>();
 
-        String query = "SELECT* FROM defaulter_customer;";
+        String query = "SELECT d.customer_id, customer_name, start_date, customer_lastname, customer_nickname, COUNT(*) days_to_pay\n" +
+                "FROM defaulter_customer d, customer c \n" +
+                "WHERE d.customer_id = c.customer_id     \n" +
+                "GROUP BY customer_id;";
 
         try {
             //prepara la conexion;'
@@ -361,38 +366,27 @@ public class ManagementDatabase{
             //ejecuta el query
             ResultSet resultSet = statement.executeQuery(query);
 
-            Customer customer;
+            Customer customer = new Customer();
 
             //pregunta si la consulta trajo resultados.
             while(resultSet.next()){
                 int customerId = resultSet.getInt("customer_id");
+                String customerName = resultSet.getString("customer_name");
+                String customerLastName = resultSet.getString("customer_lastname");
+                String startDate = resultSet.getString("start_date");
+                String customerNickname = resultSet.getString("customer_nickname");
+                int daysToPay = resultSet.getInt("days_to_pay");
 
-                String query2 = "SELECT* FROM customer WHERE customer_id = "+customerId+";";
+                customer = new Customer();
 
-                //prepara la conexion;'
-                Statement statement2 = connection.createStatement();
-                //ejecuta el query
-                ResultSet resultSet2 = statement2.executeQuery(query2);
+                customer.setCustomerId(customerId);
+                customer.setName(customerName);
+                customer.setLastName(customerLastName);
+                customer.setStarDate(Date.valueOf(startDate));
+                customer.setNickname(customerNickname);
+                customer.setDaysToPay(daysToPay);
 
-                if(resultSet2.next()){
-
-                    String customerName = resultSet2.getString("customer_name");
-                    String customerLastName = resultSet2.getString("customer_lastname");
-                    String startDate = resultSet2.getString("start_date");
-                    String customerNickname = resultSet2.getString("customer_nickname");
-
-                    customer = new Customer(customerName, customerLastName, customerNickname, Date.valueOf(startDate));
-
-                    customer.setCustomerId(customerId);
-                    customer.setName(customerName);
-                    customer.setLastName(customerLastName);
-                    customer.setStarDate(Date.valueOf(startDate));
-                    customer.setNickname(customerNickname);
-
-                    customers.add(customer);
-
-                }
-
+                customers.add(customer);
 
             }
 
@@ -522,6 +516,60 @@ public class ManagementDatabase{
         }
 
         return customers;
+
+    }
+
+    public boolean updateTheDefaulterCustomer(int idCliente, String date){
+
+        String query = "DELETE FROM defaulter_customer WHERE arrived_date>='"+date+"' AND customer_id="+idCliente+";";
+
+        try {
+            //prepara la conexion;'
+            Statement statement = connection.createStatement();
+            //ejecuta el query
+            int rowsAffeted = statement.executeUpdate(query);
+
+            if(rowsAffeted!=0){//significa que hubo un cambio en la base de datos
+                return true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+
+    }
+
+    public static ArrayList<String> getListAllBillToPay(int idCliente){
+
+        ArrayList<String> billsToPay = new ArrayList<>();
+
+        String query = "SELECT* FROM defaulter_customer WHERE customer_id="+idCliente+";";
+
+        try {
+            //prepara la conexion;'
+            Statement statement = connection.createStatement();
+            //ejecuta el query
+            ResultSet resultSet = statement.executeQuery(query);
+
+            //pregunta si la consulta trajo resultados.
+
+            while(resultSet.next()){
+
+                String dateArrived = resultSet.getString("arrived_date");
+
+                billsToPay.add(dateArrived);
+
+            }
+
+        } catch (SQLException e) {
+
+            String msj =  "Error al conectar con la base de datos. Verifique la coneccion.";
+
+        }
+
+        return billsToPay;
 
     }
 

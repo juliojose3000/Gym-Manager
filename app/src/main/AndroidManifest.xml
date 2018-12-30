@@ -33,7 +33,8 @@
             android:parentActivityName=".activities.Pesas" />
         <activity android:name=".activities.AddPayment" />
         <activity android:name=".activities.SeeDetailsCustomer" />
-        <activity android:name=".activities.Morosos"></activity>
+        <activity android:name=".activities.Morosos" />
+        <activity android:name=".activities.CustomerBillToPay"></activity>
     </application>
 
 </manifest>

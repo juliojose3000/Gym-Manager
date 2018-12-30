@@ -14,6 +14,8 @@ public class Customer {
 
     private Date starDate;
 
+    private int daysToPay;
+
     public Customer(String name, String lastName, String nickname, Date starDate) {
         this.name = name;
         this.lastName = lastName;
@@ -22,6 +24,14 @@ public class Customer {
     }
 
     public Customer() {
+    }
+
+    public int getDaysToPay() {
+        return daysToPay;
+    }
+
+    public void setDaysToPay(int daysToPay) {
+        this.daysToPay = daysToPay;
     }
 
     public int getCustomerId() {

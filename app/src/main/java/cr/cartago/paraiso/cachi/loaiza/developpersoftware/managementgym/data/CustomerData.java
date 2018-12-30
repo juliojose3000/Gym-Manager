@@ -52,6 +52,18 @@ public class CustomerData {
 
     }
 
+    public static boolean theCustomerIsDefaulter(int customerToSearh){
+
+        for (Customer customer:
+                ManagementDatabase.listAllDefaulterCustomers) {
+            if(customer.getCustomerId()==customerToSearh){
+                return true;
+            }
+        }
+        return false;
+
+    }
+
     public static Customer getCustomerById(int id){
 
         Customer customer = null;
@@ -82,14 +94,27 @@ public class CustomerData {
 
     }
 
-    //this method obtains me all clients can arrive to the gym
-    public ArrayList<Customer> getAllCustomerWithCurrentPayment(){
+    public static ArrayList<String> getAllDefaulters(){
 
-        return null;
+        ArrayList<String> listNamesAndLastNames = new ArrayList<>();
+
+        for (Customer customer:ManagementDatabase.listAllDefaulterCustomers) {
+
+            String cantDias="";
+
+            if(customer.getDaysToPay()==1){
+                cantDias=" día";
+            }else{
+                cantDias=" días";
+            }
+
+            listNamesAndLastNames.add(customer.getName()+" "+customer.getLastName()+": "+customer.getDaysToPay()+cantDias);
+
+        }
+
+        return listNamesAndLastNames;
 
     }
-
-
 
 
 }

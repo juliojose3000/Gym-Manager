@@ -40,4 +40,7 @@
     <!-- See defaulter customers -->
     <string name="defaulter_customers">Clientes morosos: </string>
 
+    <!-- Customer bill to pay -->
+    <string name="title">D: </string>
+
 </resources>

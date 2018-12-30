@@ -2,8 +2,11 @@ package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activit
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,8 +15,8 @@ import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ConnectionServer;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
 public class AddPayment extends Activity {
 
@@ -37,12 +40,20 @@ public class AddPayment extends Activity {
 
     private ManagementDatabase managementDatabase;
 
+    private Button dayButton, weekButton, monthButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_add_payment);
+
+        dayButton = findViewById(R.id.button_day_payment);
+
+        weekButton = findViewById(R.id.button_week_payment);
+
+        monthButton = findViewById(R.id.button_month_payment);
 
         Bundle extras = getIntent().getExtras();
 
@@ -77,9 +88,17 @@ public class AddPayment extends Activity {
 
         dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
+        endYear = calendar.get(Calendar.YEAR);
+
+        endMonth = calendar.get(Calendar.MONTH)+1;
+
+        endDayOfMonth = dayOfMonth;
+
         paymentDetails = "Cliente: "+customerName+"\nFecha de pago: "+dayOfMonth+"-"+month+"-"+year+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
+
+        setColorButtonPressed(v);
 
     }
 
@@ -91,17 +110,23 @@ public class AddPayment extends Activity {
 
         calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
 
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+
+        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        calendar.add(Calendar.DAY_OF_YEAR, 6);
+
+        endDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
         endYear = calendar.get(Calendar.YEAR);
 
         endMonth = calendar.get(Calendar.MONTH)+1;
 
-        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)+1;
-
-        endDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)+7;
-
         paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+dayOfMonth+"-"+month+"-"+year+"\nhasta el: "+endDayOfMonth+"-"+endMonth+"-"+endYear+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
+
+        setColorButtonPressed(v);
 
     }
 
@@ -126,8 +151,20 @@ public class AddPayment extends Activity {
 
         textView_paymentDetails.setText(paymentDetails);
 
+        setColorButtonPressed(v);
+
     }
 
+    private void setColorButtonPressed(View v){
+        /*dayButton.setBackgroundResource(android.R.drawable.btn);
+        weekButton.setBackgroundResource(android.R.drawable.btn_default);
+        monthButton.setBackgroundResource(android.R.drawable.btn_default);*/
+        //v.setBackgroundColor(Color.BLUE);
+        dayButton.getBackground().clearColorFilter();
+        weekButton.getBackground().clearColorFilter();
+        monthButton.getBackground().clearColorFilter();
+        v.getBackground().setColorFilter(Color.CYAN, PorterDuff.Mode.MULTIPLY);
+    }
 
     public void cancel(View v){
         Intent i = new Intent(AddPayment.this, Pesas.class);
@@ -136,12 +173,23 @@ public class AddPayment extends Activity {
 
     public void accept(View v){
 
+        if(paymentDetails==null){
+            Toast.makeText(this,"Seleccione la cantidad de tiempo", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         boolean isInserted = false;
 
-        if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){
+        if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){//el cliente no tiene un pago vigente
             try {
                 isInserted = managementDatabase.addPaymentFromCustomer(customerId, year+"-"+month+"-"+dayOfMonth, endYear+"-"+endMonth+"-"+endDayOfMonth, duracion);
-                ManagementDatabase.listAllCustomerWithCurrentPayment.add(CustomerData.getCustomerById(customerId));
+
+                if(CustomerData.theCustomerIsDefaulter(customerId)){//If the customer is defaulter, so delete the days covered by the payment
+
+                    managementDatabase.updateTheDefaulterCustomer(customerId, year+"-"+month+"-"+dayOfMonth);
+                    managementDatabase.fillAllList();
+
+                }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (SQLException e) {
@@ -159,12 +207,11 @@ public class AddPayment extends Activity {
                 notification = "Hubo un proble al registrar el pago. Contacte a su técnico";
             }
             Toast.makeText(this, notification, Toast.LENGTH_LONG).show();
+            Intent i = new Intent(AddPayment.this, Pesas.class);
+            startActivity(i);
         }else{
             Toast.makeText(this, customerName+" tiene un pago todavía vigente", Toast.LENGTH_LONG).show();
         }
-
-
-
 
 
 
