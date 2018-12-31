@@ -108,19 +108,20 @@ public class AddCustomer extends Activity {
             return;
         }
 
-        new Thread(new Runnable() {
-            public void run() {
-                ManagementDatabase.listAllCustomer.add(new Customer(customerName, customerLastname, customerNickname, Date.valueOf(customerStartdate)));
-                ManagementDatabase.listCustomerForAddToday.add(new Customer(customerName, customerLastname, customerNickname, Date.valueOf(customerStartdate)));
-
-            }
-        }).start();
-
         boolean isInserted = managementDatabase.insertCustomer(customerName, customerLastname, customerNickname, customerStartdate);
 
         String notification;
 
         if(isInserted){
+
+            new Thread(new Runnable() {
+                public void run() {
+                    ManagementDatabase.listAllCustomer.add(new Customer(customerName, customerLastname, customerNickname, Date.valueOf(customerStartdate)));
+                    ManagementDatabase.listCustomerForAddToday.add(new Customer(customerName, customerLastname, customerNickname, Date.valueOf(customerStartdate)));
+
+                }
+            }).start();
+
             notification = "El cliente se guardó correctamente";
             cancel(null);
         }else{

@@ -117,6 +117,8 @@ public class Pesas extends Activity {
             i = new Intent(Pesas.this, AllCustomers.class);
         }else if(id == R.id.item_all_defaulter){
             i = new Intent(Pesas.this, Morosos.class);
+        }else if(id == R.id.item_customers_to_arrived_to_specific_date){
+            i = new Intent(Pesas.this, CustomersArrivedInSpecificDay.class);
         }
         startActivity(i);
         return super.onOptionsItemSelected(item);

@@ -573,5 +573,83 @@ public class ManagementDatabase{
 
     }
 
+    public boolean cancelBillToPay(int idCliente, String date){
+
+        String query = "DELETE FROM defaulter_customer WHERE customer_id="+idCliente+" AND arrived_date='"+date+"';";
+
+        try {
+            //prepara la conexion;'
+            Statement statement = connection.createStatement();
+            //ejecuta el query
+            int rowsAffeted = statement.executeUpdate(query);
+
+            if(rowsAffeted!=0){//significa que hubo un cambio en la base de datos
+                return true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+
+    }
+
+    public boolean cancelAllBillToPay(int idCliente){
+
+        String query = "DELETE FROM defaulter_customer WHERE customer_id="+idCliente+";";
+
+        try {
+            //prepara la conexion;'
+            Statement statement = connection.createStatement();
+            //ejecuta el query
+            int rowsAffeted = statement.executeUpdate(query);
+
+            if(rowsAffeted!=0){//significa que hubo un cambio en la base de datos
+                return true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+
+    }
+
+    public ArrayList<Customer> customerInSpecificDate(String date){
+
+        ArrayList<Customer> customers = new ArrayList<>();
+
+        String query = "SELECT* FROM customertoday WHERE date_arrived='"+date+"';";
+
+        try {
+            //prepara la conexion;'
+            Statement statement = connection.createStatement();
+            //ejecuta el query
+            ResultSet resultSet = statement.executeQuery(query);
+
+            Customer customer;
+
+            //pregunta si la consulta trajo resultados.
+            while(resultSet.next()){
+
+                int customerId = resultSet.getInt("customer_id");
+
+                customers.add(CustomerData.getCustomerById(customerId));
+
+
+            }
+
+        } catch (SQLException e) {
+
+            String msj =  "Error al conectar con la base de datos. Verifique la coneccion.";
+
+        }
+
+        return customers;
+
+    }
+
 
 }

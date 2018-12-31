@@ -1,10 +1,15 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -25,6 +30,13 @@ public class CustomerBillToPay extends Activity {
     private String customerName;
 
     private TextView title;
+
+    private String dateBillToPay;
+
+    private int pos;
+
+    ArrayAdapter<String> arrayAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,20 +59,90 @@ public class CustomerBillToPay extends Activity {
 
         listBillToPayOfCustomer = managementDatabase.getListAllBillToPay(customerId);
 
-        fillLisViewCustomers();
-    }
-
-
-    public void fillLisViewCustomers() {
-
-
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+        arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_checked,
                 listBillToPayOfCustomer );
 
         listView_billToPay.setAdapter(arrayAdapter);
+        listView_billToPay.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+        listView_billToPay.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                dateBillToPay = listBillToPayOfCustomer.get(position);
+
+                pos = position;
+
+            }
+
+        });
 
     }
+
+
+
+
+
+    public void cancelBillToPay(View v){
+
+        if(dateBillToPay==null){
+            Toast.makeText(this,"Seleccione una fecha", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        boolean wasCanceled = managementDatabase.cancelBillToPay(customerId, dateBillToPay);
+
+        if(wasCanceled){
+
+            Toast.makeText(CustomerBillToPay.this,"Se ha cancelado el día con éxito", Toast.LENGTH_LONG).show();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    managementDatabase.fillAllList();
+                }
+            }).start();
+
+            listBillToPayOfCustomer.remove(pos);
+
+            arrayAdapter.notifyDataSetChanged();
+
+        }
+
+    }
+
+    public void cancelAllBillToPay(View v){
+
+        boolean wasCanceled = managementDatabase.cancelAllBillToPay(customerId);
+
+        if(wasCanceled){
+
+            Toast.makeText(CustomerBillToPay.this,"Se ha eliminado toda la deuda seleccinada con éxito", Toast.LENGTH_LONG).show();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    managementDatabase.fillAllList();
+                }
+            }).start();
+
+            listBillToPayOfCustomer.removeAll(listBillToPayOfCustomer);
+
+            arrayAdapter.notifyDataSetChanged();
+
+        }
+
+
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(CustomerBillToPay.this, Morosos.class);
+        startActivity(i);
+    }
+
 
 }

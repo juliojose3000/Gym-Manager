@@ -79,6 +79,13 @@ public class Morosos extends Activity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(Morosos.this, Pesas.class);
+        startActivity(i);
+    }
+
+
 
 
 

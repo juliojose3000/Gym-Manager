@@ -41,6 +41,6 @@
     <string name="defaulter_customers">Clientes morosos: </string>
 
     <!-- Customer bill to pay -->
-    <string name="title">D: </string>
+    <string name="button_cancel_bill_to_pay">Cancelar día</string>
 
 </resources>

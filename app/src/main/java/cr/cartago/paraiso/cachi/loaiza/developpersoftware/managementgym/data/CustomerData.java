@@ -94,6 +94,28 @@ public class CustomerData {
 
     }
 
+    public static ArrayList<String> getNameAndLastNameFromListCustomerInSpecificDay(ArrayList<Customer> listCustomers){
+
+        ArrayList<String> listNamesAndLastNames = new ArrayList<>();
+
+        if(listCustomers==null){
+
+            listNamesAndLastNames.add("No llegó nadie");
+
+        }else{
+
+            for (Customer customer:listCustomers) {
+
+                listNamesAndLastNames.add(customer.getName()+" "+customer.getLastName());
+
+            }
+
+        }
+
+        return listNamesAndLastNames;
+
+    }
+
     public static ArrayList<String> getAllDefaulters(){
 
         ArrayList<String> listNamesAndLastNames = new ArrayList<>();
