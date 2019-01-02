@@ -2,6 +2,9 @@ package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activit
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -95,6 +98,11 @@ public class AddCustomer extends Activity {
 
     public void addCustomer(View v){
 
+        if(!verifyInternetAccess()){
+            Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
+            return;
+        }
+
         final String customerName = this.customerName.getText().toString();
 
         final String customerLastname = this.customerLastname.getText().toString();
@@ -129,6 +137,21 @@ public class AddCustomer extends Activity {
         }
 
         Toast.makeText(this, notification, Toast.LENGTH_LONG).show();
+
+    }
+
+    public boolean verifyInternetAccess(){
+
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            return true;
+        }
+        else
+            return false;
 
     }
 

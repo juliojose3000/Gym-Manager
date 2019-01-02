@@ -14,7 +14,7 @@ public class CustomerData {
 
     }
 
-    public ArrayList<Customer> customerForAddToday(){
+    public static ArrayList<Customer> customerForAddToday(){
 
         ArrayList<Customer> listCustomersForAddToday = new ArrayList<>();
 

@@ -38,12 +38,8 @@ public class ManagementDatabase{
 
     public static ArrayList<Payment> listCustomersWithPaymentStillInForse;
 
-    private CustomerData customerData;
-
 
     public ManagementDatabase(){
-
-        customerData = new CustomerData();
 
         createConnectionWithDatabase = new CreateConnectionWithDatabase();
 
@@ -52,21 +48,18 @@ public class ManagementDatabase{
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
-            notification = "No se pudo conectar con la base de datos del servidor de ubuntu, por lo que se conectará con la base de datos del servidor espejo";
+            notification = "Hubo un problema al connectarse con la base de datos. Verifique su conexión a internet o contacte a su técnico";
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {
             e.printStackTrace();
         }
 
-        if(connection==null) {
 
-            return;
+    }
 
-        }
-
-        verifyUser();
-
+    public String getNotification() {
+        return notification;
     }
 
     public void fillAllList(){
@@ -83,7 +76,7 @@ public class ManagementDatabase{
 
         listCustomersOfToday = getAllCustomersOfToday(year+"-"+month+"-"+dayOfMonth);
 
-        listCustomerForAddToday = customerData.customerForAddToday();
+        listCustomerForAddToday = CustomerData.customerForAddToday();
 
         listAllDefaulterCustomers = getAllDefaulterCustomers();
 
@@ -150,13 +143,9 @@ public class ManagementDatabase{
 
     }
 
-    public String verifyUser(){
+    public boolean verifyUser(String username, String password){
 
-        String customers="";
-
-        String tableName = "customer";
-
-        String query = "SELECT* FROM "+tableName;
+        String query = "SELECT EXISTS(SELECT * FROM partner WHERE partner_username='"+username+"' AND partner_password='"+password+"') exists_partner;";
 
         try {
             //prepara la conexion;'
@@ -164,11 +153,9 @@ public class ManagementDatabase{
             //ejecuta el query
             ResultSet resultSet = statement.executeQuery(query);
 
-
-
             //pregunta si la consulta trajo resultados.
-            while(resultSet.next()){
-                customers+= (resultSet.getString("customer_name"));
+            if(resultSet.next()){
+                return resultSet.getInt("exists_partner")==1;
             }
 
         } catch (SQLException e) {
@@ -177,7 +164,7 @@ public class ManagementDatabase{
 
         }
 
-        return customers;
+        return false;
 
     }
 

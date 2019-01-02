@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.sql.SQLException;
 
@@ -21,6 +22,8 @@ public class MainActivity extends Activity {
 
     boolean aux = false;
 
+    boolean pivot = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -32,24 +35,76 @@ public class MainActivity extends Activity {
 
         editText_username = findViewById(R.id.username);
 
-        new Thread(new Runnable() {
-            public void run() {
-                managementDatabase = new ManagementDatabase();
-                managementDatabase.fillAllList();
-                aux = true;
-            }
-        }).start();
+        managementDatabase = new ManagementDatabase();
+
+        if(managementDatabase.getNotification()!=null){
+
+            Toast.makeText(this,managementDatabase.getNotification(), Toast.LENGTH_LONG).show();
+
+            pivot = true;
+
+        }else {
+
+            new Thread(new Runnable() {
+                public void run() {
+                    managementDatabase.fillAllList();
+                    aux = true;
+                }
+            }).start();
+
+        }
 
 
     }
 
 
     public void accept(View v){
+
+        if(pivot){
+
+            managementDatabase = new ManagementDatabase();
+
+            if(managementDatabase.getNotification()!=null){
+
+                Toast.makeText(this,managementDatabase.getNotification(), Toast.LENGTH_LONG).show();
+
+                pivot = true;
+
+            }else {
+
+                new Thread(new Runnable() {
+                    public void run() {
+                        managementDatabase.fillAllList();
+                        aux = true;
+                    }
+                }).start();
+
+            }
+
+        }
+
+        if(managementDatabase.getNotification()!=null){
+            return;
+        }
+
         while(!aux){
 
         }
-        Intent i = new Intent(MainActivity.this, Pesas.class);
-        startActivity(i);
+        if(managementDatabase.verifyUser(editText_username.getText().toString(), editText_password.getText().toString())){
+            Intent i = new Intent(MainActivity.this, Pesas.class);
+            startActivity(i);
+        }else{
+            Toast.makeText(this, "El usuario o contraseña están incorrectos, intente de nuevo", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    public void cancel(View v){
+
+        editText_username.setText("");
+
+        editText_password.setText("");
+
     }
 
 

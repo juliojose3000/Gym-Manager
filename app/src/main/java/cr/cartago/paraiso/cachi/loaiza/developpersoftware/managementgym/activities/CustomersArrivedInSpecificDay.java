@@ -2,6 +2,9 @@ package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activit
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -10,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -87,6 +91,12 @@ public class CustomersArrivedInSpecificDay extends Activity {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+
+                                if(!verifyInternetAccess()){
+                                    Toast.makeText(CustomersArrivedInSpecificDay.this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+
                                 dateArrivedCustomers.setText(year + "-" + (month+1) + "-" + dayOfMonth);
                                 customersInDate = managementDatabase.customerInSpecificDate(year + "-" + (month+1) + "-" + dayOfMonth);
                                 customers = CustomerData.getNameAndLastNameFromListCustomerInSpecificDay(customersInDate);
@@ -111,6 +121,22 @@ public class CustomersArrivedInSpecificDay extends Activity {
 
         listViewCustomerInSpecificDay.setAdapter(arrayAdapter);
         listViewCustomerInSpecificDay.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+    }
+
+
+    public boolean verifyInternetAccess(){
+
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            return true;
+        }
+        else
+            return false;
 
     }
 
