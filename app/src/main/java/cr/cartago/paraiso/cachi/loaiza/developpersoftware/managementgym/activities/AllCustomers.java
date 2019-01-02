@@ -1,9 +1,13 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -13,11 +17,11 @@ import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.C
 
 public class AllCustomers extends Activity {
 
-    private ManagementDatabase managementDatabase;
-
     ListView listViewCustomers;
 
     ArrayList<Customer> listCustomers;
+
+    private Customer customerSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,11 +30,22 @@ public class AllCustomers extends Activity {
 
         listViewCustomers = findViewById(R.id.listview_all_customers);
 
-        //managementDatabase = new ManagementDatabase();// Creo una nueva conexion
-
         listCustomers = ManagementDatabase.listAllCustomer;
 
         fillLisViewCustomers();
+
+
+        listViewCustomers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                customerSelected = listCustomers.get(position);
+
+            }
+
+        });
+
+
     }
 
 
@@ -59,6 +74,21 @@ public class AllCustomers extends Activity {
         }
 
         return listNamesAndLastNames;
+
+    }
+
+    public void seeDetailsCustomer(View v){
+
+        if(customerSelected==null){
+            Toast.makeText(this,"Seleccione un cliente",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Intent i = new Intent(AllCustomers.this, SeeDetailsCustomer.class);
+
+        i.putExtra("customer_id", customerSelected.getCustomerId());
+
+        startActivity(i);
 
     }
 

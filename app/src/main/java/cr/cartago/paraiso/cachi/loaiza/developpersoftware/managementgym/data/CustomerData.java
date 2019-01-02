@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Payment;
 
 public class CustomerData {
 
@@ -135,6 +136,37 @@ public class CustomerData {
         }
 
         return listNamesAndLastNames;
+
+    }
+
+    public static Payment getDetailsCustomerPayment(int customerId){
+
+        Payment payment = null;
+
+        for (Payment currentPayment:
+                ManagementDatabase.listCustomersWithPaymentStillInForse) {
+            if(currentPayment.getCustomerId()==customerId){
+                payment = currentPayment;
+                break;
+            }
+        }
+
+        return payment;
+
+
+    }
+
+    public static boolean customerHaveCurrentPayment(int customerId){
+
+        for (Payment currentPayment:
+                ManagementDatabase.listCustomersWithPaymentStillInForse) {
+            if(currentPayment.getCustomerId()==customerId){
+                return true;
+            }
+        }
+
+        return false;
+
 
     }
 

@@ -7,18 +7,21 @@ import android.widget.TextView;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Payment;
 
 public class SeeDetailsCustomer extends Activity {
 
     private int customerId;
-
-    private CustomerData customerData;
 
     private Customer customer;
 
     private String customerDetails;
 
     private TextView textView_customerDetails;
+
+    private boolean isDefaulter;
+
+    private Payment payment;
 
 
     @Override
@@ -30,14 +33,28 @@ public class SeeDetailsCustomer extends Activity {
 
         customerId = extras.getInt("customer_id");
 
-        customerData = new CustomerData();
+        customer = CustomerData.getCustomerById(customerId);
 
-        customer = customerData.getCustomerById(customerId);
+        isDefaulter = CustomerData.theCustomerIsDefaulter(customerId);
+
+        String customerStatus;
+
+        if(isDefaulter){
+            customerStatus = "El cliente está moroso";
+        }else{
+            customerStatus = "El cliente está al día";
+            if(CustomerData.customerHaveCurrentPayment(customerId)){
+                payment = CustomerData.getDetailsCustomerPayment(customerId);
+                customerStatus+="\n\nTiene un pago vigente de "+payment.getAmuntTime()+" que cubre del: "+payment.getPayDateStart()+
+                        "\nal: "+payment.getPayDateEnd();
+            }
+
+        }
 
         customerDetails = "Nombre del cliente: "+customer.getName()+" "+customer.getLastName()
                 +"\n\nConocido como: "+customer.getNickname()
                 +"\n\nInició el: "+customer.getStarDate()
-                +"\n\nEstado: al día";
+                +"\n\n"+customerStatus;
 
         textView_customerDetails = findViewById(R.id.textView_customer_details);
 

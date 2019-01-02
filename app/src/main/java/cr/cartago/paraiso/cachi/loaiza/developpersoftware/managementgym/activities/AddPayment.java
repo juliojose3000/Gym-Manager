@@ -114,6 +114,10 @@ public class AddPayment extends Activity {
 
         dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
+        month = calendar.get(Calendar.MONTH)+1;
+
+        year = calendar.get(Calendar.YEAR);
+
         calendar.add(Calendar.DAY_OF_YEAR, 6);
 
         endDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);

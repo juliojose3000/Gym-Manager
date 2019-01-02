@@ -36,6 +36,8 @@ public class ManagementDatabase{
 
     public static ArrayList<Customer> listAllCustomerWithCurrentPayment;
 
+    public static ArrayList<Payment> listCustomersWithPaymentStillInForse;
+
     private CustomerData customerData;
 
 
@@ -86,6 +88,8 @@ public class ManagementDatabase{
         listAllDefaulterCustomers = getAllDefaulterCustomers();
 
         listAllCustomerWithCurrentPayment = getAllCustomersWithCurrentPayment(year+"-"+month+"-"+dayOfMonth);
+
+        listCustomersWithPaymentStillInForse = getListCustomersWithPaymentStillInForse(year+"-"+month+"-"+dayOfMonth);
 
     }
 
@@ -487,7 +491,7 @@ public class ManagementDatabase{
 
         ArrayList<Customer> customers = new ArrayList<>();
 
-        String query = "SELECT* FROM customer_pay WHERE pay_end>'"+today+"';";
+        String query = "SELECT* FROM customer_pay WHERE pay_end>='"+today+"';";
 
         try {
             //prepara la conexion;'
@@ -648,6 +652,52 @@ public class ManagementDatabase{
         }
 
         return customers;
+
+    }
+
+    public ArrayList<Payment> getListCustomersWithPaymentStillInForse(String date){
+
+        ArrayList<Payment> listCustomersWithPaymentStillInForse = new ArrayList<>();
+
+        String query = "SELECT* FROM customer_pay WHERE pay_end>='"+date+"';";
+
+        try {
+            //prepara la conexion;'
+            Statement statement = connection.createStatement();
+            //ejecuta el query
+            ResultSet resultSet = statement.executeQuery(query);
+
+            //pregunta si la consulta trajo resultados.
+
+            Payment payment;
+
+            while(resultSet.next()){
+
+                payment = new Payment();
+
+                int paymentId  = resultSet.getInt("customer_pay_id");
+                int customerId = resultSet.getInt("customer_id");
+                String payDateStart = resultSet.getString("pay_date");
+                String payDateEnd = resultSet.getString("pay_end");
+                String amuntTime = resultSet.getString("amount_time");
+
+                payment.setPaymentId(paymentId);
+                payment.setCustomerId(customerId);
+                payment.setPayDateStart(payDateStart);
+                payment.setPayDateEnd(payDateEnd);
+                payment.setAmuntTime(amuntTime);
+
+                listCustomersWithPaymentStillInForse.add(payment);
+
+            }
+
+        } catch (SQLException e) {
+
+            String msj =  "Error al conectar con la base de datos. Verifique la coneccion.";
+
+        }
+
+        return listCustomersWithPaymentStillInForse;
 
     }
 
