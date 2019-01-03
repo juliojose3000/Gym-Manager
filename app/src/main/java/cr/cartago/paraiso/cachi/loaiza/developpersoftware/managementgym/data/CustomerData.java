@@ -1,6 +1,7 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
@@ -168,6 +169,44 @@ public class CustomerData {
         return false;
 
 
+    }
+
+    public static ArrayList<Customer> customerToSearch(String customerToSearch, ArrayList<Customer> customers){
+
+        ArrayList<Customer> customersToSearch = new ArrayList<>();
+
+        for (Customer currentCustomer:
+                customers) {
+
+            if(containsIgnoreCase(currentCustomer.getName(), customerToSearch)  || containsIgnoreCase(currentCustomer.getLastName(), customerToSearch)){
+                customersToSearch.add(currentCustomer);
+            }
+
+        }
+
+        return customersToSearch;
+
+    }
+
+    public static boolean containsIgnoreCase(String src, String what) {
+        final int length = what.length();
+        if (length == 0)
+            return true; // Empty string is contained
+
+        final char firstLo = Character.toLowerCase(what.charAt(0));
+        final char firstUp = Character.toUpperCase(what.charAt(0));
+
+        for (int i = src.length() - length; i >= 0; i--) {
+            // Quick check before calling the more expensive regionMatches() method:
+            final char ch = src.charAt(i);
+            if (ch != firstLo && ch != firstUp)
+                continue;
+
+            if (src.regionMatches(true, i, what, 0, length))
+                return true;
+        }
+
+        return false;
     }
 
 

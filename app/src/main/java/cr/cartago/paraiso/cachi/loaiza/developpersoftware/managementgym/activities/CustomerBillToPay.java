@@ -84,10 +84,6 @@ public class CustomerBillToPay extends Activity {
 
     }
 
-
-
-
-
     public void cancelBillToPay(View v){
 
         if(!verifyInternetAccess()){
@@ -156,7 +152,6 @@ public class CustomerBillToPay extends Activity {
         Intent i = new Intent(CustomerBillToPay.this, Morosos.class);
         startActivity(i);
     }
-
 
     public boolean verifyInternetAccess(){
 

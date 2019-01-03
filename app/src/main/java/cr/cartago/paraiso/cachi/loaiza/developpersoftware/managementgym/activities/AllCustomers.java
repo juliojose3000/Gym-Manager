@@ -1,32 +1,42 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
 public class AllCustomers extends Activity {
 
-    ListView listViewCustomers;
+    private ListView listViewCustomers;
 
-    ArrayList<Customer> listCustomers;
+    private ArrayList<Customer> listCustomers;
 
     private Customer customerSelected;
 
+    private EditText editText_customerToSearch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_all_customers);
+
+        editText_customerToSearch = findViewById(R.id.editText_customerToSearch2);
 
         listViewCustomers = findViewById(R.id.listview_all_customers);
 
@@ -91,6 +101,25 @@ public class AllCustomers extends Activity {
         startActivity(i);
 
     }
+
+
+    public void customerToSearch2(View v){
+
+        String nameCustomerToSearch = editText_customerToSearch.getText().toString();
+
+        listCustomers = CustomerData.customerToSearch(nameCustomerToSearch, ManagementDatabase.listAllCustomer);
+
+        fillLisViewCustomers();
+
+        hideKeyboard();
+
+    }
+
+    private void hideKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+    }
+
 
 
 }

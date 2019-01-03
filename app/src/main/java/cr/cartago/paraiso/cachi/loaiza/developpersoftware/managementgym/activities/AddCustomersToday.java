@@ -7,8 +7,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -34,12 +36,16 @@ public class AddCustomersToday extends Activity {
 
     private ManagementDatabase managementDatabase;
 
+    private EditText editText_customerToSearch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_add_customers_today);
+
+        editText_customerToSearch = findViewById(R.id.editText_customerToSearch);
 
         listViewCustomers = findViewById(R.id.listview_customers);
 
@@ -83,7 +89,7 @@ public class AddCustomersToday extends Activity {
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_checked,
-                getNameAndLastNameFromListCustomer() );
+                getNameAndLastNameFromListCustomer(listCustomersForAddToday) );
 
         listViewCustomers.setAdapter(arrayAdapter);
         listViewCustomers.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -91,7 +97,7 @@ public class AddCustomersToday extends Activity {
     }
 
 
-    private ArrayList<String> getNameAndLastNameFromListCustomer(){
+    private ArrayList<String> getNameAndLastNameFromListCustomer(ArrayList<Customer> listCustomersForAddToday){
 
         ArrayList<String> listNamesAndLastNames = new ArrayList<>();
 
@@ -180,8 +186,6 @@ public class AddCustomersToday extends Activity {
 
     }
 
-
-
     public boolean areAllFalse()
     {
         for(boolean b : itemsChecked) if(b) return false;
@@ -201,6 +205,25 @@ public class AddCustomersToday extends Activity {
         else
             return false;
 
+    }
+
+    public void customerToSearch(View v){
+
+        String nameCustomerToSearch = editText_customerToSearch.getText().toString();
+
+        listCustomersForAddToday = CustomerData.customerToSearch(nameCustomerToSearch, ManagementDatabase.listCustomerForAddToday);
+
+        itemsChecked = new boolean[listCustomersForAddToday.size()];
+
+        fillLisViewCustomers();
+
+        hideKeyboard();
+
+    }
+
+    private void hideKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
 

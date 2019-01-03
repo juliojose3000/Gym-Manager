@@ -194,6 +194,11 @@ public class AddPayment extends Activity {
 
     public void accept(View v){
 
+        if(!verifyInternetAccess()){
+            Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
+            return;
+        }
+
         if(paymentDetails==null){
             Toast.makeText(this,"Seleccione la cantidad de tiempo", Toast.LENGTH_LONG).show();
             return;
@@ -225,7 +230,7 @@ public class AddPayment extends Activity {
             if(isInserted){
                 notification = "Se ha registrado el pago correctamente";
             }else{
-                notification = "Hubo un proble al registrar el pago. Contacte a su técnico";
+                notification = "Hubo un problema al registrar el pago. Contacte a su técnico";
             }
             Toast.makeText(this, notification, Toast.LENGTH_LONG).show();
             Intent i = new Intent(AddPayment.this, Pesas.class);
