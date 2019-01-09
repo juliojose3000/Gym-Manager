@@ -70,7 +70,9 @@ public class MainActivity extends Activity {
         if(!aux){
             managementDatabase = new ManagementDatabase();
         }
-        
+
+
+
         if(managementDatabase.getNotification()!=null){
 
             Toast.makeText(this,managementDatabase.getNotification(), Toast.LENGTH_LONG).show();

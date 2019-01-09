@@ -42,7 +42,7 @@ public class Morosos extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-            customerSelected = customers.get(position);
+                customerSelected = customers.get(position);
 
             }
 

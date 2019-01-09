@@ -9,83 +9,81 @@
 
     <TextView
         android:id="@+id/textView_payment_customer"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:layout_marginEnd="28dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="27dp"
+        android:layout_width="330dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="329dp"
+        android:layout_marginEnd="27dp"
+        android:layout_marginStart="27dp"
+        android:layout_marginTop="23dp"
         android:gravity="center"
         android:textSize="21sp"
+        app:layout_constraintBottom_toTopOf="@+id/button_add_payment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button_day_payment"
-        android:layout_width="0dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="26dp"
+        android:layout_marginBottom="51dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="174dp"
         android:onClick="day"
         android:text="@string/add_day_payment"
-        app:layout_constraintBaseline_toBaselineOf="@+id/button_week_payment"
-        app:layout_constraintEnd_toStartOf="@+id/button_week_payment"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/textView_payment_details"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button_week_payment"
-        android:layout_width="0dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="58dp"
+        android:layout_marginBottom="51dp"
         android:layout_marginEnd="26dp"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="66dp"
         android:onClick="week"
         android:text="@string/add_week_payment"
         app:layout_constraintBottom_toTopOf="@+id/textView_payment_details"
         app:layout_constraintEnd_toStartOf="@+id/button_month_payment"
-        app:layout_constraintStart_toEndOf="@+id/button_day_payment" />
+        app:layout_constraintStart_toEndOf="@+id/button_day_payment"
+        app:layout_constraintTop_toBottomOf="@+id/textView_payment_customer" />
 
     <Button
         android:id="@+id/button_month_payment"
-        android:layout_width="0dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
+        android:layout_marginTop="66dp"
         android:onClick="month"
         android:text="@string/add_month_payment"
-        app:layout_constraintBaseline_toBaselineOf="@+id/button_week_payment"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button_week_payment" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_payment_customer" />
 
     <TextView
         android:id="@+id/textView_payment_details"
-        android:layout_width="218dp"
-        android:layout_height="101dp"
-        android:layout_marginBottom="155dp"
-        android:layout_marginEnd="57dp"
+        android:layout_width="215dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="145dp"
+        android:layout_marginEnd="67dp"
+        android:layout_marginStart="102dp"
         android:gravity="left"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_day_payment" />
 
     <Button
         android:id="@+id/button_add_payment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="37dp"
-        android:layout_marginStart="87dp"
+        android:layout_marginBottom="34dp"
         android:onClick="accept"
         android:text="@string/button_accept"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_payment_customer" />
 
-    <Button
-        android:id="@+id/button_cancel_payment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="38dp"
-        android:layout_marginEnd="49dp"
-        android:layout_marginStart="50dp"
-        android:onClick="cancel"
-        android:text="@string/button_cancel"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/button_month_payment"
-        app:layout_constraintStart_toEndOf="@+id/button_add_payment" />
 </android.support.constraint.ConstraintLayout>

@@ -16,10 +16,7 @@ public class PaymentData {
 
     public void getAllDefaulters(){
 
-
-
     }
-
 
     public void addDefaulter(int customerId, String date){
 

@@ -39,6 +39,8 @@ public class AddCustomer extends Activity {
 
     private ManagementDatabase managementDatabase;
 
+    private ThreadConnectionDB threadConnectionDB;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -80,11 +82,9 @@ public class AddCustomer extends Activity {
 
         });
 
-        this.runOnUiThread(new Runnable() {
-            public void run() {
-                managementDatabase = new ManagementDatabase();
-            }
-        });
+        threadConnectionDB = new ThreadConnectionDB();
+
+        threadConnectionDB.start();
 
     }
 
@@ -121,19 +121,24 @@ public class AddCustomer extends Activity {
             return;
         }
 
+        while(threadConnectionDB.isAlive()){
+
+        }
+
         boolean isInserted = managementDatabase.insertCustomer(customerName, customerLastname, customerNickname, customerStartdate);
 
         String notification;
 
         if(isInserted){
 
-            new Thread(new Runnable() {
+            new Thread() {
                 public void run() {
                     ManagementDatabase.listAllCustomer.add(new Customer(customerName, customerLastname, customerNickname, Date.valueOf(customerStartdate)));
                     ManagementDatabase.listCustomerForAddToday.add(new Customer(customerName, customerLastname, customerNickname, Date.valueOf(customerStartdate)));
-
                 }
-            }).start();
+            }.start();
+
+
 
             notification = "El cliente se guardó correctamente";
             cancel(null);
@@ -158,6 +163,13 @@ public class AddCustomer extends Activity {
         else
             return false;
 
+    }
+
+    public class ThreadConnectionDB extends Thread{
+        public void run()
+        {
+            managementDatabase = new ManagementDatabase();
+        }
     }
 
 

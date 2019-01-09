@@ -43,6 +43,8 @@ public class CustomersArrivedInSpecificDay extends Activity {
 
     private ArrayList<String> customers;
 
+    private ThreadConnectionDB threadConnectionDB;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -99,6 +101,10 @@ public class CustomersArrivedInSpecificDay extends Activity {
 
         });
 
+        threadConnectionDB = new ThreadConnectionDB();
+
+        threadConnectionDB.start();
+
     }
 
     private void onClickInSpecificDate(int year, int month, int dayOfMonth){
@@ -107,7 +113,8 @@ public class CustomersArrivedInSpecificDay extends Activity {
             Toast.makeText(CustomersArrivedInSpecificDay.this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
             return;
         }
-        managementDatabase = new ManagementDatabase();
+
+        while(threadConnectionDB.isAlive()){}
 
         dateArrivedCustomers.setText(year + "-" + (month+1) + "-" + dayOfMonth);
 
@@ -151,6 +158,13 @@ public class CustomersArrivedInSpecificDay extends Activity {
 
     }
 
+
+    public class ThreadConnectionDB extends Thread{
+        public void run()
+        {
+            managementDatabase = new ManagementDatabase();
+        }
+    }
 
 
 }

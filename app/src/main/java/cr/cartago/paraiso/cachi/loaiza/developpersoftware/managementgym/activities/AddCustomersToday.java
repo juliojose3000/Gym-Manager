@@ -38,6 +38,8 @@ public class AddCustomersToday extends Activity {
 
     private EditText editText_customerToSearch;
 
+    ArrayList<Integer> customersId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -78,14 +80,13 @@ public class AddCustomersToday extends Activity {
 
         });
 
-        this.runOnUiThread(new Runnable() {
+        new Thread() {
             public void run() {
                 managementDatabase = new ManagementDatabase();
             }
-        });
+        }.start();
 
     }
-
 
     public void fillLisViewCustomers() {
 
@@ -157,7 +158,7 @@ public class AddCustomersToday extends Activity {
             return;
         }
 
-        ArrayList<Integer> customersId = new ArrayList<>();
+        customersId = new ArrayList<>();
 
         for(int i = 0; i<listCustomersForAddToday.size(); i++){
 
@@ -171,20 +172,19 @@ public class AddCustomersToday extends Activity {
 
                 if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){
                     managementDatabase.addCustomerDefaulter(customerId, today);//si el cliente ha llegado y no tiene un pago vigente que lo cubra, se agrega a morosos
+                    ManagementDatabase.listAllDefaulterCustomers.add(CustomerData.getCustomerById(customerId));
                 }
             }
         }
+
 
         for(int i = 0; i<customersId.size(); i++){
 
             ManagementDatabase.listCustomerForAddToday.remove(CustomerData.getCustomerById(customersId.get(i)));
 
+            ManagementDatabase.listCustomersOfToday.add(CustomerData.getCustomerById(customersId.get(i)));
+
         }
-        this.runOnUiThread(new Runnable() {
-            public void run() {
-                managementDatabase.fillAllList();
-            }
-        });
 
         Toast.makeText(this, "Se han agregado los clientes que han llegado hoy", Toast.LENGTH_LONG).show();
 

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.MainActivity;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 
 public class CustomerBillToPay extends Activity {
@@ -38,8 +39,9 @@ public class CustomerBillToPay extends Activity {
 
     private int pos;
 
-    ArrayAdapter<String> arrayAdapter;
+    private ArrayAdapter<String> arrayAdapter;
 
+    private ThreadConnectionDB threadConnectionDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,12 +82,15 @@ public class CustomerBillToPay extends Activity {
 
         });
 
-        this.runOnUiThread(new Runnable() {
+        /*new Thread() {
             public void run() {
                 managementDatabase = new ManagementDatabase();
             }
-        });
+        }.start();*/
 
+        threadConnectionDB = new ThreadConnectionDB();
+
+        threadConnectionDB.start();
 
     }
 
@@ -101,15 +106,17 @@ public class CustomerBillToPay extends Activity {
             return;
         }
 
+        while(threadConnectionDB.isAlive()){
+
+        }
+
         boolean wasCanceled = managementDatabase.cancelBillToPay(customerId, dateBillToPay);
 
         if(wasCanceled){
 
-            this.runOnUiThread(new Runnable() {
-                public void run() {
-                    Toast.makeText(CustomerBillToPay.this,"Se ha cancelado el día con éxito", Toast.LENGTH_LONG).show();
-                }
-            });
+            Toast.makeText(CustomerBillToPay.this,"Se ha cancelado el día con éxito", Toast.LENGTH_LONG).show();
+
+            CustomerData.reduceBillToPayToCustomer(customerId);
 
             new Thread(new Runnable() {
                 @Override
@@ -143,13 +150,6 @@ public class CustomerBillToPay extends Activity {
 
             Toast.makeText(CustomerBillToPay.this,"Se ha eliminado toda la deuda seleccinada con éxito", Toast.LENGTH_LONG).show();
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    managementDatabase.fillAllList();
-                }
-            }).start();
-
             listBillToPayOfCustomer.removeAll(listBillToPayOfCustomer);
 
             arrayAdapter.notifyDataSetChanged();
@@ -181,5 +181,13 @@ public class CustomerBillToPay extends Activity {
 
     }
 
+    public class ThreadConnectionDB extends Thread{
+        public void run()
+        {
+            managementDatabase = new ManagementDatabase();
+
+            managementDatabase.fillAllList();
+        }
+    }
 
 }

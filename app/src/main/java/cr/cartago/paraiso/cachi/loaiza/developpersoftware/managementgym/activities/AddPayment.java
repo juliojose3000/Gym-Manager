@@ -45,6 +45,10 @@ public class AddPayment extends Activity {
 
     private Button dayButton, weekButton, monthButton;
 
+    private ThreadConnectionDB threadConnectionDB;
+
+    private ThreadFillAllList threadFillAllList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -77,6 +81,12 @@ public class AddPayment extends Activity {
         textView_paymentDetails = findViewById(R.id.textView_payment_details);
 
         textView_customerName.setText("Agregar un pago a "+customerName);
+
+        threadConnectionDB = new ThreadConnectionDB();
+
+        threadFillAllList = new ThreadFillAllList();
+
+        threadConnectionDB.start();
 
     }
 
@@ -202,7 +212,9 @@ public class AddPayment extends Activity {
             return;
         }
 
-        managementDatabase = new ManagementDatabase();
+        while(threadConnectionDB.isAlive()){
+
+        }
 
         boolean isInserted = false;
 
@@ -213,8 +225,9 @@ public class AddPayment extends Activity {
                 if(CustomerData.theCustomerIsDefaulter(customerId)){//If the customer is defaulter, so delete the days covered by the payment
 
                     managementDatabase.updateTheDefaulterCustomer(customerId, year+"-"+month+"-"+dayOfMonth);
-                    managementDatabase.fillAllList();
 
+                    threadFillAllList.start();
+                    //managementDatabase.fillAllList();
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -229,12 +242,12 @@ public class AddPayment extends Activity {
 
             if(isInserted){
                 notification = "Se ha registrado el pago correctamente";
+                disabilityButtons();
             }else{
                 notification = "Hubo un problema al registrar el pago. Contacte a su técnico";
             }
             Toast.makeText(this, notification, Toast.LENGTH_LONG).show();
-            Intent i = new Intent(AddPayment.this, Pesas.class);
-            startActivity(i);
+
         }else{
             Toast.makeText(this, customerName+" tiene un pago todavía vigente", Toast.LENGTH_LONG).show();
         }
@@ -243,6 +256,35 @@ public class AddPayment extends Activity {
 
     }
 
+
+    public class ThreadConnectionDB extends Thread{
+        public void run()
+        {
+            managementDatabase = new ManagementDatabase();
+        }
+    }
+
+
+    public class ThreadFillAllList extends Thread{
+        public void run()
+        {
+            managementDatabase.fillAllList();
+        }
+    }
+
+
+    @Override
+    public void onBackPressed(){
+
+        Intent i = new Intent(AddPayment.this, Pesas.class);
+        startActivity(i);
+    }
+
+    private void disabilityButtons(){
+        monthButton.setEnabled(false);
+        dayButton.setEnabled(false);
+        weekButton.setEnabled(false);
+    }
 
 
 }

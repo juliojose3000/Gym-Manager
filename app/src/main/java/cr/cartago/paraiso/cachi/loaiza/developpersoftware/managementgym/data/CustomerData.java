@@ -42,11 +42,11 @@ public class CustomerData {
 
     }
 
-    public static boolean theCustomerHaveCurrentPayment(int customerToSearh){
+    public static boolean theCustomerHaveCurrentPayment(int customerId){
 
         for (Customer customer:
                 ManagementDatabase.listAllCustomerWithCurrentPayment) {
-            if(customer.getCustomerId()==customerToSearh){
+            if(customer.getCustomerId()==customerId){
                 return true;
             }
         }
@@ -138,6 +138,42 @@ public class CustomerData {
 
     }
 
+    public static void reduceBillToPayToCustomer(int customerId){
+
+        for (Customer customer:ManagementDatabase.listAllDefaulterCustomers) {
+
+            if(customer.getCustomerId()==customerId){
+
+                if(customer.getDaysToPay()==1){
+
+                    removeFromDefaulters(customerId);
+
+                    break;
+
+                }else{
+
+                    customer.setDaysToPay(customer.getDaysToPay()-1);
+
+                    break;
+
+                }
+            }
+
+        }
+
+    }
+
+    private static void removeFromDefaulters(int customerId){
+
+        for (int i = 0; i<ManagementDatabase.listAllDefaulterCustomers.size(); i++) {
+            Customer customer = ManagementDatabase.listAllDefaulterCustomers.get(i);
+            if(customer.getCustomerId()==customerId){
+                ManagementDatabase.listAllDefaulterCustomers.remove(i);
+            }
+        }
+
+    }
+
     public static Payment getDetailsCustomerPayment(int customerId){
 
         Payment payment = null;
@@ -205,6 +241,17 @@ public class CustomerData {
         }
 
         return false;
+    }
+
+    public void updateCustomerDefaulter(int customerId, String date){
+
+        for (Customer customer:
+             ManagementDatabase.listAllDefaulterCustomers) {
+
+
+
+        }
+
     }
 
 

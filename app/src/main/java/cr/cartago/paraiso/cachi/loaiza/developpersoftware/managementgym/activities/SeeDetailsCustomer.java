@@ -43,13 +43,18 @@ public class SeeDetailsCustomer extends Activity {
             customerStatus = "El cliente está moroso";
         }else{
             customerStatus = "El cliente está al día";
-            if(CustomerData.customerHaveCurrentPayment(customerId)){
-                payment = CustomerData.getDetailsCustomerPayment(customerId);
-                customerStatus+="\n\nTiene un pago vigente de "+payment.getAmuntTime()+" que cubre del: "+payment.getPayDateStart()+
-                        "\nal: "+payment.getPayDateEnd();
-            }
-
         }
+
+        if(CustomerData.customerHaveCurrentPayment(customerId)){
+            payment = CustomerData.getDetailsCustomerPayment(customerId);
+            customerStatus+="\n\nTiene un pago vigente de "+payment.getAmuntTime()+" que cubre del: "+payment.getPayDateStart()+
+                    "\nal: "+payment.getPayDateEnd();
+        }
+
+
+
+
+
 
         customerDetails = "Nombre del cliente: "+customer.getName()+" "+customer.getLastName()
                 +"\n\nConocido como: "+customer.getNickname()
