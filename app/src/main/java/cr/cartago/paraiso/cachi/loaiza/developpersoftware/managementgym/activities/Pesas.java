@@ -132,7 +132,7 @@ public class Pesas extends Activity {
     }
 
 
-    public void seeAllCustomers(View v){
+    public void addCustomersToday(View v){
 
         if(!verifyInternetAccess()){
             Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();

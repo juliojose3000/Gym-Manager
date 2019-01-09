@@ -52,15 +52,13 @@ public class CustomerBillToPay extends Activity {
 
         customerName = extras.getString("customer_name");
 
-        managementDatabase = new ManagementDatabase();
-
         title = findViewById(R.id.textView_title_customer_bill_to_pay);
 
         listView_billToPay = findViewById(R.id.listview_bill_to_pay);
 
         title.setText("Días que ha llegado "+customerName+" sin pagar:");
 
-        listBillToPayOfCustomer = managementDatabase.getListAllBillToPay(customerId);
+        listBillToPayOfCustomer = ManagementDatabase.getListAllBillToPay(customerId);
 
         arrayAdapter = new ArrayAdapter<>(
                 this,
@@ -82,6 +80,13 @@ public class CustomerBillToPay extends Activity {
 
         });
 
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                managementDatabase = new ManagementDatabase();
+            }
+        });
+
+
     }
 
     public void cancelBillToPay(View v){
@@ -100,7 +105,11 @@ public class CustomerBillToPay extends Activity {
 
         if(wasCanceled){
 
-            Toast.makeText(CustomerBillToPay.this,"Se ha cancelado el día con éxito", Toast.LENGTH_LONG).show();
+            this.runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(CustomerBillToPay.this,"Se ha cancelado el día con éxito", Toast.LENGTH_LONG).show();
+                }
+            });
 
             new Thread(new Runnable() {
                 @Override
@@ -113,6 +122,8 @@ public class CustomerBillToPay extends Activity {
 
             arrayAdapter.notifyDataSetChanged();
 
+            listView_billToPay.clearChoices();
+
         }
 
     }
@@ -123,6 +134,8 @@ public class CustomerBillToPay extends Activity {
             Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
             return;
         }
+
+        managementDatabase = new ManagementDatabase();
 
         boolean wasCanceled = managementDatabase.cancelAllBillToPay(customerId);
 

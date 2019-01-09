@@ -78,8 +78,6 @@ public class AddPayment extends Activity {
 
         textView_customerName.setText("Agregar un pago a "+customerName);
 
-        managementDatabase = new ManagementDatabase();
-
     }
 
     public boolean verifyInternetAccess(){
@@ -203,6 +201,8 @@ public class AddPayment extends Activity {
             Toast.makeText(this,"Seleccione la cantidad de tiempo", Toast.LENGTH_LONG).show();
             return;
         }
+
+        managementDatabase = new ManagementDatabase();
 
         boolean isInserted = false;
 

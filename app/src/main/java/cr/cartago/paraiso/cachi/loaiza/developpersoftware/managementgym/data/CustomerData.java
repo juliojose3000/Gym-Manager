@@ -102,8 +102,6 @@ public class CustomerData {
 
         if(listCustomers==null){
 
-            listNamesAndLastNames.add("No llegó nadie");
-
         }else{
 
             for (Customer customer:listCustomers) {

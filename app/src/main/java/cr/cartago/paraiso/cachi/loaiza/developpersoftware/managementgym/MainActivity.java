@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -14,15 +15,15 @@ import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database
 
 public class MainActivity extends Activity {
 
-    EditText editText_password;
+    private EditText editText_password;
 
-    EditText editText_username;
+    private EditText editText_username;
 
-    public static ManagementDatabase managementDatabase;
+    private ManagementDatabase managementDatabase;
 
-    boolean aux = false;
+    private boolean aux = false;
 
-    boolean pivot = false;
+    private Button buttonAccept;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,13 +36,46 @@ public class MainActivity extends Activity {
 
         editText_username = findViewById(R.id.username);
 
-        managementDatabase = new ManagementDatabase();
+        buttonAccept = findViewById(R.id.button_accept_mainActivity);
 
+        this.runOnUiThread(new Runnable() {
+
+            public void run() {
+
+                managementDatabase = new ManagementDatabase();
+
+                if(managementDatabase.getNotification()!=null){
+                    aux = false;
+                    Toast.makeText(MainActivity.this,managementDatabase.getNotification(), Toast.LENGTH_LONG).show();
+
+                }else {
+
+                    new Thread(new Runnable() {
+                        public void run() {
+                            managementDatabase.fillAllList();
+                            aux = true;
+                        }
+                    }).start();
+
+                }
+            }
+        });
+
+
+    }
+
+
+    public void accept(View v){
+
+        if(!aux){
+            managementDatabase = new ManagementDatabase();
+        }
+        
         if(managementDatabase.getNotification()!=null){
 
             Toast.makeText(this,managementDatabase.getNotification(), Toast.LENGTH_LONG).show();
 
-            pivot = true;
+            return;
 
         }else {
 
@@ -51,35 +85,6 @@ public class MainActivity extends Activity {
                     aux = true;
                 }
             }).start();
-
-        }
-
-
-    }
-
-
-    public void accept(View v){
-
-        if(pivot){
-
-            managementDatabase = new ManagementDatabase();
-
-            if(managementDatabase.getNotification()!=null){
-
-                Toast.makeText(this,managementDatabase.getNotification(), Toast.LENGTH_LONG).show();
-
-                pivot = true;
-
-            }else {
-
-                new Thread(new Runnable() {
-                    public void run() {
-                        managementDatabase.fillAllList();
-                        aux = true;
-                    }
-                }).start();
-
-            }
 
         }
 

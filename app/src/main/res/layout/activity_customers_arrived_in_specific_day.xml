@@ -16,7 +16,7 @@
         android:ems="10"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        android:hint="@string/customer_startdate"
+        android:hint="Seleccione una fecha"
         android:inputType="none"
         app:layout_constraintBottom_toTopOf="@+id/listview_customer_in_date"
         app:layout_constraintEnd_toEndOf="parent"

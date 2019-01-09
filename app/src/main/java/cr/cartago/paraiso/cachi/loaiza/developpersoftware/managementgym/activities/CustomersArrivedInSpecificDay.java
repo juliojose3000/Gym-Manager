@@ -52,8 +52,6 @@ public class CustomersArrivedInSpecificDay extends Activity {
 
         dateArrivedCustomers = findViewById(R.id.editText_date_arrived);
 
-        managementDatabase = new ManagementDatabase();
-
         listViewCustomerInSpecificDay = findViewById(R.id.listview_customer_in_date);
 
         customers = CustomerData.getNameAndLastNameFromListCustomerInSpecificDay(customersInDate);
@@ -75,32 +73,25 @@ public class CustomersArrivedInSpecificDay extends Activity {
 
         });
 
+        calendar = Calendar.getInstance();
+
+        year = calendar.get(Calendar.YEAR);
+
+        month = calendar.get(Calendar.MONTH);
+
+        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
         dateArrivedCustomers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                calendar = Calendar.getInstance();
-
-                year = calendar.get(Calendar.YEAR);
-
-                month = calendar.get(Calendar.MONTH);
-
-                dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
                 datePickerDialog = new DatePickerDialog(CustomersArrivedInSpecificDay.this,
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
-                                if(!verifyInternetAccess()){
-                                    Toast.makeText(CustomersArrivedInSpecificDay.this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
-                                    return;
-                                }
+                                onClickInSpecificDate(year, month, dayOfMonth);
 
-                                dateArrivedCustomers.setText(year + "-" + (month+1) + "-" + dayOfMonth);
-                                customersInDate = managementDatabase.customerInSpecificDate(year + "-" + (month+1) + "-" + dayOfMonth);
-                                customers = CustomerData.getNameAndLastNameFromListCustomerInSpecificDay(customersInDate);
-                                fillLisViewCustomers();
                             }
                         },year,month,dayOfMonth);
                 datePickerDialog.show();
@@ -110,6 +101,27 @@ public class CustomersArrivedInSpecificDay extends Activity {
 
     }
 
+    private void onClickInSpecificDate(int year, int month, int dayOfMonth){
+
+        if(!verifyInternetAccess()){
+            Toast.makeText(CustomersArrivedInSpecificDay.this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
+            return;
+        }
+        managementDatabase = new ManagementDatabase();
+
+        dateArrivedCustomers.setText(year + "-" + (month+1) + "-" + dayOfMonth);
+
+        customersInDate = managementDatabase.customerInSpecificDate(year + "-" + (month+1) + "-" + dayOfMonth);
+
+        customers = CustomerData.getNameAndLastNameFromListCustomerInSpecificDay(customersInDate);
+
+        if(customers.size()==0){
+            Toast.makeText(this, "Nadie llegó en esta fecha",Toast.LENGTH_LONG).show();
+        }
+
+        fillLisViewCustomers();
+
+    }
 
     public void fillLisViewCustomers() {
 
@@ -123,7 +135,6 @@ public class CustomersArrivedInSpecificDay extends Activity {
         listViewCustomerInSpecificDay.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
     }
-
 
     public boolean verifyInternetAccess(){
 

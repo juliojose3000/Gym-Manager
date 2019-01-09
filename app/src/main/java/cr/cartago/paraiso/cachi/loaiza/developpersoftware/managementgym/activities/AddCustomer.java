@@ -54,7 +54,7 @@ public class AddCustomer extends Activity {
 
         customerStartdate = findViewById(R.id.editText_customer_startdate);
 
-        buttonAccept = findViewById(R.id.button_accept);
+        buttonAccept = findViewById(R.id.button_accept_mainActivity);
 
         customerStartdate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,9 +80,14 @@ public class AddCustomer extends Activity {
 
         });
 
-        managementDatabase = new ManagementDatabase();
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                managementDatabase = new ManagementDatabase();
+            }
+        });
 
     }
+
 
     public void cancel(View v){
 

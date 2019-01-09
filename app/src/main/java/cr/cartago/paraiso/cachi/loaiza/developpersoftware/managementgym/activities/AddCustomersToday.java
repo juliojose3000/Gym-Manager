@@ -78,7 +78,11 @@ public class AddCustomersToday extends Activity {
 
         });
 
-        managementDatabase = new ManagementDatabase();
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                managementDatabase = new ManagementDatabase();
+            }
+        });
 
     }
 
@@ -148,12 +152,12 @@ public class AddCustomersToday extends Activity {
             return;
         }
 
-        ArrayList<Integer> customersId = new ArrayList<>();
-
         if(areAllFalse()){
             Toast.makeText(this, "Seleccione al menos un cliente", Toast.LENGTH_LONG).show();
             return;
         }
+
+        ArrayList<Integer> customersId = new ArrayList<>();
 
         for(int i = 0; i<listCustomersForAddToday.size(); i++){
 
@@ -176,12 +180,16 @@ public class AddCustomersToday extends Activity {
             ManagementDatabase.listCustomerForAddToday.remove(CustomerData.getCustomerById(customersId.get(i)));
 
         }
-
-        managementDatabase.fillAllList();
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                managementDatabase.fillAllList();
+            }
+        });
 
         Toast.makeText(this, "Se han agregado los clientes que han llegado hoy", Toast.LENGTH_LONG).show();
 
         Intent i = new Intent(AddCustomersToday.this, Pesas.class);
+
         startActivity(i);
 
     }
