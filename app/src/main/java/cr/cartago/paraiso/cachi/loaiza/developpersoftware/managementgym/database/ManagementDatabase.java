@@ -32,8 +32,6 @@ public class ManagementDatabase{
 
     public static ArrayList<Customer> listAllDefaulterCustomers;
 
-    public static ArrayList<String> listAllBillToPay;
-
     public static ArrayList<Customer> listAllCustomerWithCurrentPayment;
 
     public static ArrayList<Payment> listCustomersWithPaymentStillInForse;
@@ -550,7 +548,7 @@ public class ManagementDatabase{
 
                 String dateArrived = resultSet.getString("arrived_date");
 
-                billsToPay.add(dateArrived);
+                billsToPay.add(CustomerData.getDateForShowUser(dateArrived));
 
             }
 

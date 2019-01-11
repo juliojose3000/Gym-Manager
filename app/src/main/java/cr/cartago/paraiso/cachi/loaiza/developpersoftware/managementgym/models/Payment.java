@@ -12,6 +12,17 @@ public class Payment {
 
     private String amuntTime;
 
+    public Payment() {
+
+    }
+
+    public Payment(int customerId, String payDateStart, String payDateEnd, String amuntTime) {
+        this.customerId = customerId;
+        this.payDateStart = payDateStart;
+        this.payDateEnd = payDateEnd;
+        this.amuntTime = amuntTime;
+    }
+
     public int getPaymentId() {
         return paymentId;
     }

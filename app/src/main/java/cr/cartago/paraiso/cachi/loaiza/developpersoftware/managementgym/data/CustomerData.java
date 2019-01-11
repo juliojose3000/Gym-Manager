@@ -54,11 +54,11 @@ public class CustomerData {
 
     }
 
-    public static boolean theCustomerIsDefaulter(int customerToSearh){
+    public static boolean theCustomerIsDefaulter(int customerId){
 
         for (Customer customer:
                 ManagementDatabase.listAllDefaulterCustomers) {
-            if(customer.getCustomerId()==customerToSearh){
+            if(customer.getCustomerId()==customerId){
                 return true;
             }
         }
@@ -243,13 +243,58 @@ public class CustomerData {
         return false;
     }
 
-    public void updateCustomerDefaulter(int customerId, String date){
+    public static String getDateForShowUser(String date){
+
+        String[] dateParts = date.split("-");
+
+        String day = dateParts[2];
+
+        String month = getMonthByNum(Integer.parseInt(dateParts[1])-1);
+
+        String year = dateParts[0];
+
+        return day+" "+month+" "+year;
+
+    }
+
+    public static String getMonthByNum(int i){
+        String[] months = {"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dec"};
+        return months[i];
+    }
+
+    public static String getDateForDB(String date){
+
+        String[] dateParts = date.split(" ");
+
+        String day = dateParts[0];
+
+        String month = getNumByMonth(dateParts[1]);
+
+        String year = dateParts[2];
+
+        return year+"-"+month+"-"+day;
+    }
+
+    private static String getNumByMonth(String month){
+
+        String[] months = {"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dec"};
+
+        for(int i = 0; i< months.length; i++){
+            if(months[i].equals(month)){
+                return ""+(++i);
+            }
+        }
+
+        return "";
+    }
+
+    public static void incrementDaysForPay(int customerId){
 
         for (Customer customer:
              ManagementDatabase.listAllDefaulterCustomers) {
-
-
-
+            if(customer.getCustomerId()==customerId){
+                customer.setDaysToPay(customer.getDaysToPay()+1);
+            }
         }
 
     }

@@ -164,15 +164,23 @@ public class AddCustomersToday extends Activity {
 
             if(itemsChecked[i]){
                 String today = year+"-"+month+"-"+dayOfMonth;
+
                 //obtengo el cliente de la posicion seleccionada en la lista y obtengo su id
                 int customerId = listCustomersForAddToday.get(i).getCustomerId();
                 customersId.add(customerId);
 
                 managementDatabase.insertCustomersOfToday(customerId, today);
 
-                if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){
+                if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){// the customer doesn't have a current payment
+
+                    if(CustomerData.theCustomerIsDefaulter(customerId)){//if the customer already is defaulter, only increases the days to pay
+                        CustomerData.incrementDaysForPay(customerId);
+                    }else{//on the other hand, if the customer doesn't is defaulter, it to add in the defaulters list
+                        ManagementDatabase.listAllDefaulterCustomers.add(CustomerData.getCustomerById(customerId));
+                        CustomerData.incrementDaysForPay(customerId);
+                    }
+
                     managementDatabase.addCustomerDefaulter(customerId, today);//si el cliente ha llegado y no tiene un pago vigente que lo cubra, se agrega a morosos
-                    ManagementDatabase.listAllDefaulterCustomers.add(CustomerData.getCustomerById(customerId));
                 }
             }
         }

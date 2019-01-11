@@ -47,8 +47,10 @@ public class SeeDetailsCustomer extends Activity {
 
         if(CustomerData.customerHaveCurrentPayment(customerId)){
             payment = CustomerData.getDetailsCustomerPayment(customerId);
-            customerStatus+="\n\nTiene un pago vigente de "+payment.getAmuntTime()+" que cubre del: "+payment.getPayDateStart()+
-                    "\nal: "+payment.getPayDateEnd();
+            customerStatus+="\n\nTiene un pago vigente de "+payment.getAmuntTime()+" que cubre\ndel: "+
+                    CustomerData.getDateForShowUser(payment.getPayDateStart())+
+                    "\nal: "+CustomerData.getDateForShowUser(payment.getPayDateEnd());
+
         }
 
 
@@ -56,9 +58,12 @@ public class SeeDetailsCustomer extends Activity {
 
 
 
-        customerDetails = "Nombre del cliente: "+customer.getName()+" "+customer.getLastName()
-                +"\n\nConocido como: "+customer.getNickname()
-                +"\n\nInició el: "+customer.getStarDate()
+        customerDetails = "Nombre del cliente: "+customer.getName()+" "+customer.getLastName();
+
+        if(!customer.getNickname().equals("")){
+            customerDetails+="\n\nConocido(a) como: "+customer.getNickname();
+        }
+        customerDetails+="\n\nInició el: "+CustomerData.getDateForShowUser(customer.getStarDate().toString())
                 +"\n\n"+customerStatus;
 
         textView_customerDetails = findViewById(R.id.textView_customer_details);

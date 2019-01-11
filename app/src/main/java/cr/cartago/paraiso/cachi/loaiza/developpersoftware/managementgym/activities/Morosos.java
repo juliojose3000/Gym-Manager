@@ -48,8 +48,6 @@ public class Morosos extends Activity {
 
         });
 
-
-
         fillLisViewCustomers();
     }
 

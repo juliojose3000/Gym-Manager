@@ -110,7 +110,7 @@ public class CustomerBillToPay extends Activity {
 
         }
 
-        boolean wasCanceled = managementDatabase.cancelBillToPay(customerId, dateBillToPay);
+        boolean wasCanceled = managementDatabase.cancelBillToPay(customerId, CustomerData.getDateForDB(dateBillToPay));
 
         if(wasCanceled){
 

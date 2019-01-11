@@ -20,6 +20,7 @@ import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Payment;
 
 public class AddPayment extends Activity {
 
@@ -119,7 +120,9 @@ public class AddPayment extends Activity {
 
         endDayOfMonth = dayOfMonth;
 
-        paymentDetails = "Cliente: "+customerName+"\nFecha de pago: "+dayOfMonth+"-"+month+"-"+year+"\nDuración: "+duracion;
+        String fechaPago = CustomerData.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
+
+        paymentDetails = "Cliente: "+customerName+"\nFecha de pago: "+fechaPago+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
@@ -151,7 +154,11 @@ public class AddPayment extends Activity {
 
         endMonth = calendar.get(Calendar.MONTH)+1;
 
-        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+dayOfMonth+"-"+month+"-"+year+"\nhasta el: "+endDayOfMonth+"-"+endMonth+"-"+endYear+"\nDuración: "+duracion;
+        String startDate = CustomerData.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
+
+        String endDate = CustomerData.getDateForShowUser(year+"-"+endMonth+"-"+endDayOfMonth);
+
+        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+startDate+"\nhasta el: "+endDate+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
@@ -176,7 +183,11 @@ public class AddPayment extends Activity {
 
         dayOfMonth  = 1;
 
-        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+dayOfMonth+"-"+month+"-"+year+"\nhasta el: "+endDayOfMonth+"-"+endMonth+"-"+endYear+"\nDuración: "+duracion;
+        String startDate = CustomerData.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
+
+        String endDate = CustomerData.getDateForShowUser(year+"-"+endMonth+"-"+endDayOfMonth);
+
+        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+startDate+"\nhasta el: "+endDate+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
@@ -220,7 +231,13 @@ public class AddPayment extends Activity {
 
         if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){//el cliente no tiene un pago vigente
             try {
-                isInserted = managementDatabase.addPaymentFromCustomer(customerId, year+"-"+month+"-"+dayOfMonth, endYear+"-"+endMonth+"-"+endDayOfMonth, duracion);
+                String startDate = year+"-"+month+"-"+dayOfMonth;
+
+                String endDate = endYear+"-"+endMonth+"-"+endDayOfMonth;
+
+                isInserted = managementDatabase.addPaymentFromCustomer(customerId, startDate, endDate, duracion);
+
+                ManagementDatabase.listCustomersWithPaymentStillInForse.add(new Payment(customerId, startDate, endDate, duracion));
 
                 if(CustomerData.theCustomerIsDefaulter(customerId)){//If the customer is defaulter, so delete the days covered by the payment
 
