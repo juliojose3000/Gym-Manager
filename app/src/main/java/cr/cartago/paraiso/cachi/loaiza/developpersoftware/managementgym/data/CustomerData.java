@@ -1,7 +1,11 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
@@ -297,6 +301,38 @@ public class CustomerData {
             }
         }
 
+    }
+
+    public static String getDayName(String inputDate){
+
+        String[] dayNames = {"Lunes","Martes","Miércoles","Jueves", "Viernes", "Sábado", "Domingo"};
+
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd").parse(inputDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        String day = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(date);
+
+        if(day.equals("Monday")){
+            return dayNames[0];
+        }else if(day.equals("Tuesday")){
+            return dayNames[1];
+        }else if(day.equals("Wednesday")){
+            return dayNames[2];
+        }else if(day.equals("Thursday")){
+            return dayNames[3];
+        }else if(day.equals("Friday")){
+            return dayNames[4];
+        }else if(day.equals("Saturday")){
+            return dayNames[5];
+        }else if(day.equals("Sunday")){
+            return dayNames[6];
+        }
+
+        return "";
     }
 
 

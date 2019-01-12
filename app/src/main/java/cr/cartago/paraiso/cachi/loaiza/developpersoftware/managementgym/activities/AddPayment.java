@@ -122,7 +122,9 @@ public class AddPayment extends Activity {
 
         String fechaPago = CustomerData.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
 
-        paymentDetails = "Cliente: "+customerName+"\nFecha de pago: "+fechaPago+"\nDuración: "+duracion;
+        String dayName = CustomerData.getDayName(year+"-"+month+"-"+dayOfMonth);
+
+        paymentDetails = "Cliente: "+customerName+"\nFecha de pago: "+dayName+", "+fechaPago+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
@@ -156,9 +158,14 @@ public class AddPayment extends Activity {
 
         String startDate = CustomerData.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
 
+        String startDayName =CustomerData.getDayName(year+"-"+month+"-"+dayOfMonth);
+
         String endDate = CustomerData.getDateForShowUser(year+"-"+endMonth+"-"+endDayOfMonth);
 
-        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+startDate+"\nhasta el: "+endDate+"\nDuración: "+duracion;
+        String endDayName = CustomerData.getDayName(year+"-"+endMonth+"-"+endDayOfMonth);
+
+        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+startDayName+", "+startDate+
+                "\nhasta el: "+endDayName+", "+endDate+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
@@ -185,9 +192,14 @@ public class AddPayment extends Activity {
 
         String startDate = CustomerData.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
 
+        String startDayName =CustomerData.getDayName(year+"-"+month+"-"+dayOfMonth);
+
         String endDate = CustomerData.getDateForShowUser(year+"-"+endMonth+"-"+endDayOfMonth);
 
-        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+startDate+"\nhasta el: "+endDate+"\nDuración: "+duracion;
+        String endDayName = CustomerData.getDayName(year+"-"+endMonth+"-"+endDayOfMonth);
+
+        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+startDayName+", "+startDate+
+                "\nhasta el: "+endDayName+", "+endDate+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 

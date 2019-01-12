@@ -548,7 +548,9 @@ public class ManagementDatabase{
 
                 String dateArrived = resultSet.getString("arrived_date");
 
-                billsToPay.add(CustomerData.getDateForShowUser(dateArrived));
+                String day = CustomerData.getDayName(dateArrived);
+
+                billsToPay.add(day+", "+CustomerData.getDateForShowUser(dateArrived));
 
             }
 

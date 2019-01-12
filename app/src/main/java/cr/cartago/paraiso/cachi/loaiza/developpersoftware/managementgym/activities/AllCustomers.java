@@ -116,8 +116,12 @@ public class AllCustomers extends Activity {
     }
 
     private void hideKeyboard(){
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        View view = this.getCurrentFocus();
+        if(view !=null){
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+
     }
 
 

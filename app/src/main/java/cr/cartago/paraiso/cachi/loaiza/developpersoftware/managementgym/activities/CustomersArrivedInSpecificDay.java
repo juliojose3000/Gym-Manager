@@ -93,6 +93,7 @@ public class CustomersArrivedInSpecificDay extends Activity {
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
 
                                 onClickInSpecificDate(year, month, dayOfMonth);
+                                view.updateDate(year,month,dayOfMonth);
 
                             }
                         },year,month,dayOfMonth);
@@ -116,7 +117,11 @@ public class CustomersArrivedInSpecificDay extends Activity {
 
         while(threadConnectionDB.isAlive()){}
 
-        dateArrivedCustomers.setText(year + "-" + (month+1) + "-" + dayOfMonth);
+        String date = CustomerData.getDateForShowUser(year + "-" + (month+1) + "-" + dayOfMonth);
+
+        String dayName = CustomerData.getDayName(year + "-" + (month+1) + "-" + dayOfMonth);
+
+        dateArrivedCustomers.setText(dayName+", "+date);
 
         customersInDate = managementDatabase.customerInSpecificDate(year + "-" + (month+1) + "-" + dayOfMonth);
 
