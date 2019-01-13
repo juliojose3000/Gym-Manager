@@ -14,6 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.MainActivity;
@@ -82,12 +83,6 @@ public class CustomerBillToPay extends Activity {
 
         });
 
-        /*new Thread() {
-            public void run() {
-                managementDatabase = new ManagementDatabase();
-            }
-        }.start();*/
-
         threadConnectionDB = new ThreadConnectionDB();
 
         threadConnectionDB.start();
@@ -106,9 +101,22 @@ public class CustomerBillToPay extends Activity {
             return;
         }
 
-        while(threadConnectionDB.isAlive()){
+        //if the connection have be closed, it create a new connection
+        try {
+            if(threadConnectionDB.isAlive()){
+                while(threadConnectionDB.isAlive()){}
+            }
+            if(managementDatabase.theConnectionIsClose()){
 
+                threadConnectionDB = new ThreadConnectionDB();
+
+                threadConnectionDB.start();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
+        while(threadConnectionDB.isAlive()){}
 
         boolean wasCanceled = managementDatabase.cancelBillToPay(customerId, CustomerData.getDateForDB(dateBillToPay));
 

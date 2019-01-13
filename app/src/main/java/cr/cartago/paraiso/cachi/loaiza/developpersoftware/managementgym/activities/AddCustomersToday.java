@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -38,7 +39,9 @@ public class AddCustomersToday extends Activity {
 
     private EditText editText_customerToSearch;
 
-    ArrayList<Integer> customersId;
+    private ArrayList<Integer> customersId;
+
+    private ThreadConnectionDB threadConnectionDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,11 +83,9 @@ public class AddCustomersToday extends Activity {
 
         });
 
-        new Thread() {
-            public void run() {
-                managementDatabase = new ManagementDatabase();
-            }
-        }.start();
+        threadConnectionDB = new ThreadConnectionDB();
+
+        threadConnectionDB.start();
 
     }
 
@@ -152,6 +153,23 @@ public class AddCustomersToday extends Activity {
             Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
             return;
         }
+
+        //if the connection have be closed, it create a new connection
+        try {
+            if(threadConnectionDB.isAlive()){
+                while(threadConnectionDB.isAlive()){}
+            }
+            if(managementDatabase.theConnectionIsClose()){
+
+                threadConnectionDB = new ThreadConnectionDB();
+
+                threadConnectionDB.start();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        while(threadConnectionDB.isAlive()){}
 
         if(areAllFalse()){
             Toast.makeText(this, "Seleccione al menos un cliente", Toast.LENGTH_LONG).show();
@@ -244,6 +262,13 @@ public class AddCustomersToday extends Activity {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
 
+    }
+
+    public class ThreadConnectionDB extends Thread{
+        public void run()
+        {
+            managementDatabase = new ManagementDatabase();
+        }
     }
 
 

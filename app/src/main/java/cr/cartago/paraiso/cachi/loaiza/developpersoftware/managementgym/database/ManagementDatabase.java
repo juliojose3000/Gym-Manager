@@ -88,6 +88,10 @@ public class ManagementDatabase{
         connection.close();
     }
 
+    public boolean theConnectionIsClose() throws SQLException {
+        return this.connection.isClosed();
+    }
+
     public static void createNewConnection() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
         connection = createConnectionWithDatabase.createConnection("julio@loaiza-server","123Loaiza", "gym_cachi","loaiza-server.mysql.database.azure.com:3306");
     }

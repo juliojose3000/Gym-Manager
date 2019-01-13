@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.sql.Date;
+import java.sql.SQLException;
 import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
@@ -121,9 +122,22 @@ public class AddCustomer extends Activity {
             return;
         }
 
-        while(threadConnectionDB.isAlive()){
+        //if the connection have be closed, it create a new connection
+        try {
+            if(threadConnectionDB.isAlive()){
+                while(threadConnectionDB.isAlive()){}
+            }
+            if(managementDatabase.theConnectionIsClose()){
 
+                threadConnectionDB = new ThreadConnectionDB();
+
+                threadConnectionDB.start();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
+        while(threadConnectionDB.isAlive()){}
 
         boolean isInserted = managementDatabase.insertCustomer(customerName, customerLastname, customerNickname, customerStartdate);
 

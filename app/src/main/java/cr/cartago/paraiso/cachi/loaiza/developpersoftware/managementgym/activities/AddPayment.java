@@ -235,6 +235,21 @@ public class AddPayment extends Activity {
             return;
         }
 
+        //if the connection have be closed, it create a new connection
+        try {
+            if(threadConnectionDB.isAlive()){
+                while(threadConnectionDB.isAlive()){}
+            }
+            if(managementDatabase.theConnectionIsClose()){
+
+                threadConnectionDB = new ThreadConnectionDB();
+
+                threadConnectionDB.start();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         while(threadConnectionDB.isAlive()){
 
         }

@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -115,7 +116,20 @@ public class CustomersArrivedInSpecificDay extends Activity {
             return;
         }
 
-        while(threadConnectionDB.isAlive()){}
+        //if the connection have be closed, it create a new connection
+        try {
+            if(threadConnectionDB.isAlive()){
+                while(threadConnectionDB.isAlive()){}
+            }
+            if(managementDatabase.theConnectionIsClose()){
+
+                threadConnectionDB = new ThreadConnectionDB();
+
+                threadConnectionDB.start();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         String date = CustomerData.getDateForShowUser(year + "-" + (month+1) + "-" + dayOfMonth);
 

@@ -13,7 +13,6 @@ import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.P
 
 public class CustomerData {
 
-
     public CustomerData(){
 
 
@@ -267,6 +266,11 @@ public class CustomerData {
     }
 
     public static String getDateForDB(String date){
+
+        if(date.contains(",")){
+            String[] newDate = date.split(",");
+            date = newDate[1].substring(1);
+        }
 
         String[] dateParts = date.split(" ");
 
