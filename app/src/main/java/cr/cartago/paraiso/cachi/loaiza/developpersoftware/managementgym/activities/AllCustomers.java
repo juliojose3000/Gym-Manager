@@ -15,8 +15,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
 public class AllCustomers extends Activity {
@@ -39,8 +37,6 @@ public class AllCustomers extends Activity {
         editText_customerToSearch = findViewById(R.id.editText_customerToSearch2);
 
         listViewCustomers = findViewById(R.id.listview_all_customers);
-
-        listCustomers = ManagementDatabase.listAllCustomer;
 
         fillLisViewCustomers();
 
@@ -104,14 +100,6 @@ public class AllCustomers extends Activity {
 
 
     public void customerToSearch2(View v){
-
-        String nameCustomerToSearch = editText_customerToSearch.getText().toString();
-
-        listCustomers = CustomerData.customerToSearch(nameCustomerToSearch, ManagementDatabase.listAllCustomer);
-
-        fillLisViewCustomers();
-
-        hideKeyboard();
 
     }
 

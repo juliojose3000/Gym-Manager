@@ -35,8 +35,6 @@ public class Morosos extends Activity {
 
         listView_defaulterCustomers = findViewById(R.id.listview_defaulterCustomers);
 
-        customers = ManagementDatabase.listAllDefaulterCustomers;
-
         listView_defaulterCustomers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

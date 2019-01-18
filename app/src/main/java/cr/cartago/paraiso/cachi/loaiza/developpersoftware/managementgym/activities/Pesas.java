@@ -55,8 +55,6 @@ public class Pesas extends Activity {
 
         listCustomers = new ArrayList<>();
 
-        listCustomers = ManagementDatabase.listCustomersOfToday;
-
         listViewCustomers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -75,13 +73,6 @@ public class Pesas extends Activity {
 
                 row.setBackgroundColor (Color.TRANSPARENT); // default coloe
 
-                for (Customer customer:
-                     ManagementDatabase.listAllDefaulterCustomers) {
-                    if(getItem(position).equals(customer.getName()+" "+customer.getLastName()))
-                    {
-                        row.setBackgroundColor (Color.argb(100,255,0,0)); // some color
-                    }
-                }
                 return row;
             }
         });

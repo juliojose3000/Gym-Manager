@@ -25,7 +25,6 @@ public class CustomerBillToPay extends Activity {
 
     private ListView listView_billToPay;
 
-    private ManagementDatabase managementDatabase;
 
     private int customerId;
 
@@ -58,8 +57,6 @@ public class CustomerBillToPay extends Activity {
 
         title.setText("Días que ha llegado "+customerName+" sin pagar:");
 
-        listBillToPayOfCustomer = ManagementDatabase.getListAllBillToPay(customerId);
-
         arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_checked,
@@ -88,79 +85,10 @@ public class CustomerBillToPay extends Activity {
 
     public void cancelBillToPay(View v){
 
-        if(!verifyInternetAccess()){
-            Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        if(dateBillToPay==null){
-            Toast.makeText(this,"Seleccione una fecha", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        //if the connection have be closed, it create a new connection
-        try {
-            if(threadConnectionDB.isAlive()){
-                while(threadConnectionDB.isAlive()){}
-            }
-            if(managementDatabase.theConnectionIsClose()){
-
-                threadConnectionDB = new ThreadConnectionDB();
-
-                threadConnectionDB.start();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        while(threadConnectionDB.isAlive()){}
-
-        boolean wasCanceled = managementDatabase.cancelBillToPay(customerId, CustomerData.getDateForDB(dateBillToPay));
-
-        if(wasCanceled){
-
-            Toast.makeText(CustomerBillToPay.this,"Se ha cancelado el día con éxito", Toast.LENGTH_LONG).show();
-
-            CustomerData.reduceBillToPayToCustomer(customerId);
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    managementDatabase.fillAllList();
-                }
-            }).start();
-
-            listBillToPayOfCustomer.remove(pos);
-
-            arrayAdapter.notifyDataSetChanged();
-
-            listView_billToPay.clearChoices();
-
-        }
 
     }
 
     public void cancelAllBillToPay(View v){
-
-        if(!verifyInternetAccess()){
-            Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        managementDatabase = new ManagementDatabase();
-
-        boolean wasCanceled = managementDatabase.cancelAllBillToPay(customerId);
-
-        if(wasCanceled){
-
-            Toast.makeText(CustomerBillToPay.this,"Se ha eliminado toda la deuda seleccinada con éxito", Toast.LENGTH_LONG).show();
-
-            listBillToPayOfCustomer.removeAll(listBillToPayOfCustomer);
-
-            arrayAdapter.notifyDataSetChanged();
-
-        }
-
 
 
     }
@@ -189,9 +117,7 @@ public class CustomerBillToPay extends Activity {
     public class ThreadConnectionDB extends Thread{
         public void run()
         {
-            managementDatabase = new ManagementDatabase();
 
-            managementDatabase.fillAllList();
         }
     }
 

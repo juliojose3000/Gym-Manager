@@ -39,8 +39,6 @@ public class AddPayment extends Activity {
 
     private Calendar calendar;
 
-    private ManagementDatabase managementDatabase;
-
     private Button dayButton, weekButton, monthButton;
 
     private ThreadConnectionDB threadConnectionDB;
@@ -222,77 +220,6 @@ public class AddPayment extends Activity {
 
     public void accept(View v){
 
-        if(!verifyInternetAccess()){
-            Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        if(paymentDetails==null){
-            Toast.makeText(this,"Seleccione la cantidad de tiempo", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        //if the connection have be closed, it create a new connection
-        try {
-            if(threadConnectionDB.isAlive()){
-                while(threadConnectionDB.isAlive()){}
-            }
-            if(managementDatabase.theConnectionIsClose()){
-
-                threadConnectionDB = new ThreadConnectionDB();
-
-                threadConnectionDB.start();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        while(threadConnectionDB.isAlive()){
-
-        }
-
-        boolean isInserted = false;
-
-        if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){//el cliente no tiene un pago vigente
-            try {
-                String startDate = year+"-"+month+"-"+dayOfMonth;
-
-                String endDate = endYear+"-"+endMonth+"-"+endDayOfMonth;
-
-                isInserted = managementDatabase.addPaymentFromCustomer(customerId, startDate, endDate, duracion);
-
-                ManagementDatabase.listCustomersWithPaymentStillInForse.add(new Payment(customerId, startDate, endDate, duracion));
-
-                if(CustomerData.theCustomerIsDefaulter(customerId)){//If the customer is defaulter, so delete the days covered by the payment
-
-                    managementDatabase.updateTheDefaulterCustomer(customerId, year+"-"+month+"-"+dayOfMonth);
-
-                    threadFillAllList.start();
-                    //managementDatabase.fillAllList();
-                }
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            String notification;
-
-            if(isInserted){
-                notification = "Se ha registrado el pago correctamente";
-                disabilityButtons();
-            }else{
-                notification = "Hubo un problema al registrar el pago. Contacte a su técnico";
-            }
-            Toast.makeText(this, notification, Toast.LENGTH_LONG).show();
-
-        }else{
-            Toast.makeText(this, customerName+" tiene un pago todavía vigente", Toast.LENGTH_LONG).show();
-        }
-
 
 
     }
@@ -301,7 +228,7 @@ public class AddPayment extends Activity {
     public class ThreadConnectionDB extends Thread{
         public void run()
         {
-            managementDatabase = new ManagementDatabase();
+
         }
     }
 
@@ -309,7 +236,7 @@ public class AddPayment extends Activity {
     public class ThreadFillAllList extends Thread{
         public void run()
         {
-            managementDatabase.fillAllList();
+
         }
     }
 

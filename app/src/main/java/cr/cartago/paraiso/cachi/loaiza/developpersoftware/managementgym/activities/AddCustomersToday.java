@@ -34,8 +34,6 @@ public class AddCustomersToday extends Activity {
 
     private boolean[] itemsChecked;
 
-    private ManagementDatabase managementDatabase;
-
     private EditText editText_customerToSearch;
 
     private ArrayList<Integer> customersId;
@@ -60,8 +58,6 @@ public class AddCustomersToday extends Activity {
         month = calendar.get(Calendar.MONTH)+1;
 
         dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-
-        listCustomersForAddToday = ManagementDatabase.listCustomerForAddToday;
 
         itemsChecked = new boolean[listCustomersForAddToday.size()];
 
@@ -148,74 +144,6 @@ public class AddCustomersToday extends Activity {
 
     public void accept(View v){
 
-        if(!verifyInternetAccess()){
-            Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        //if the connection have be closed, it create a new connection
-        try {
-            if(threadConnectionDB.isAlive()){
-                while(threadConnectionDB.isAlive()){}
-            }
-            if(managementDatabase.theConnectionIsClose()){
-
-                threadConnectionDB = new ThreadConnectionDB();
-
-                threadConnectionDB.start();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        while(threadConnectionDB.isAlive()){}
-
-        if(areAllFalse()){
-            Toast.makeText(this, "Seleccione al menos un cliente", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        customersId = new ArrayList<>();
-
-        for(int i = 0; i<listCustomersForAddToday.size(); i++){
-
-            if(itemsChecked[i]){
-                String today = year+"-"+month+"-"+dayOfMonth;
-
-                //obtengo el cliente de la posicion seleccionada en la lista y obtengo su id
-                int customerId = listCustomersForAddToday.get(i).getCustomerId();
-                customersId.add(customerId);
-
-                managementDatabase.insertCustomersOfToday(customerId, today);
-
-                if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){// the customer doesn't have a current payment
-
-                    if(CustomerData.theCustomerIsDefaulter(customerId)){//if the customer already is defaulter, only increases the days to pay
-                        CustomerData.incrementDaysForPay(customerId);
-                    }else{//on the other hand, if the customer doesn't is defaulter, it to add in the defaulters list
-                        ManagementDatabase.listAllDefaulterCustomers.add(CustomerData.getCustomerById(customerId));
-                        CustomerData.incrementDaysForPay(customerId);
-                    }
-
-                    managementDatabase.addCustomerDefaulter(customerId, today);//si el cliente ha llegado y no tiene un pago vigente que lo cubra, se agrega a morosos
-                }
-            }
-        }
-
-
-        for(int i = 0; i<customersId.size(); i++){
-
-            ManagementDatabase.listCustomerForAddToday.remove(CustomerData.getCustomerById(customersId.get(i)));
-
-            ManagementDatabase.listCustomersOfToday.add(CustomerData.getCustomerById(customersId.get(i)));
-
-        }
-
-        Toast.makeText(this, "Se han agregado los clientes que han llegado hoy", Toast.LENGTH_LONG).show();
-
-        Intent i = new Intent(AddCustomersToday.this, Pesas.class);
-
-        startActivity(i);
 
     }
 
@@ -242,15 +170,7 @@ public class AddCustomersToday extends Activity {
 
     public void customerToSearch(View v){
 
-        String nameCustomerToSearch = editText_customerToSearch.getText().toString();
 
-        listCustomersForAddToday = CustomerData.customerToSearch(nameCustomerToSearch, ManagementDatabase.listCustomerForAddToday);
-
-        itemsChecked = new boolean[listCustomersForAddToday.size()];
-
-        fillLisViewCustomers();
-
-        hideKeyboard();
 
     }
 
@@ -266,7 +186,7 @@ public class AddCustomersToday extends Activity {
     public class ThreadConnectionDB extends Thread{
         public void run()
         {
-            managementDatabase = new ManagementDatabase();
+
         }
     }
 

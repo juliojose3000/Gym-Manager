@@ -32,8 +32,6 @@ public class CustomersArrivedInSpecificDay extends Activity {
 
     private Calendar calendar;
 
-    private ManagementDatabase managementDatabase;
-
     private ListView listViewCustomerInSpecificDay;
 
     private ArrayAdapter<String> arrayAdapter;
@@ -109,42 +107,6 @@ public class CustomersArrivedInSpecificDay extends Activity {
 
     private void onClickInSpecificDate(int year, int month, int dayOfMonth){
 
-        if(!verifyInternetAccess()){
-            Toast.makeText(CustomersArrivedInSpecificDay.this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        //if the connection have be closed, it create a new connection
-        try {
-            if(threadConnectionDB.isAlive()){
-                while(threadConnectionDB.isAlive()){}
-            }
-            if(managementDatabase.theConnectionIsClose()){
-
-                threadConnectionDB = new ThreadConnectionDB();
-
-                threadConnectionDB.start();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        String date = CustomerData.getDateForShowUser(year + "-" + (month+1) + "-" + dayOfMonth);
-
-        String dayName = CustomerData.getDayName(year + "-" + (month+1) + "-" + dayOfMonth);
-
-        dateArrivedCustomers.setText(dayName+", "+date);
-
-        customersInDate = managementDatabase.customerInSpecificDate(year + "-" + (month+1) + "-" + dayOfMonth);
-
-        customers = CustomerData.getNameAndLastNameFromListCustomerInSpecificDay(customersInDate);
-
-        if(customers.size()==0){
-            Toast.makeText(this, "Nadie llegó en esta fecha",Toast.LENGTH_LONG).show();
-        }
-
-        fillLisViewCustomers();
-
     }
 
     public void fillLisViewCustomers() {
@@ -179,7 +141,7 @@ public class CustomersArrivedInSpecificDay extends Activity {
     public class ThreadConnectionDB extends Thread{
         public void run()
         {
-            managementDatabase = new ManagementDatabase();
+
         }
     }
 

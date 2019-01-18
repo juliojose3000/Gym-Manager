@@ -20,8 +20,6 @@ public class SeeDetailsCustomer extends Activity {
 
     private boolean isDefaulter;
 
-    private Payment payment;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,19 +44,7 @@ public class SeeDetailsCustomer extends Activity {
 
         if(CustomerData.customerHaveCurrentPayment(customerId)){
 
-            payment = CustomerData.getDetailsCustomerPayment(customerId);
 
-            if(payment.getAmuntTime().equals("un día")){
-                customerStatus+="\n\nTiene un pago vigente de "+payment.getAmuntTime()+" que cubre el "+
-                        CustomerData.getDayName(payment.getPayDateStart())+", "+
-                        CustomerData.getDateForShowUser(payment.getPayDateStart());
-            }else{
-                customerStatus+="\n\nTiene un pago vigente de "+payment.getAmuntTime()+" que cubre\ndel "+
-                        CustomerData.getDayName(payment.getPayDateStart())+", "+
-                        CustomerData.getDateForShowUser(payment.getPayDateStart())+"\nal "+
-                        CustomerData.getDayName(payment.getPayDateEnd())+", "+
-                        CustomerData.getDateForShowUser(payment.getPayDateEnd());
-            }
 
         }
 
