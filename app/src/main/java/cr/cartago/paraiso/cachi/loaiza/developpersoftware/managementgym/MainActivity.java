@@ -2,16 +2,25 @@ package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.sql.SQLException;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activities.Pesas;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBCustomer;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.HttpJsonParser;
 
 public class MainActivity extends Activity {
 
@@ -19,11 +28,11 @@ public class MainActivity extends Activity {
 
     private EditText editText_username;
 
-    private ManagementDatabase managementDatabase;
+    private Testing testing;
 
-    private boolean aux = false;
+    String TAG_SUCCESS = "success";
 
-    private Button buttonAccept;
+    String TAG_STUFF = "stuff";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,73 +45,15 @@ public class MainActivity extends Activity {
 
         editText_username = findViewById(R.id.username);
 
-        buttonAccept = findViewById(R.id.button_accept_mainActivity);
+        testing = new Testing();
 
-        this.runOnUiThread(new Runnable() {
-
-            public void run() {
-
-                managementDatabase = new ManagementDatabase();
-
-                if(managementDatabase.getNotification()!=null){
-                    aux = false;
-                    Toast.makeText(MainActivity.this,managementDatabase.getNotification(), Toast.LENGTH_LONG).show();
-
-                }else {
-
-                    new Thread(new Runnable() {
-                        public void run() {
-                            managementDatabase.fillAllList();
-                            aux = true;
-                        }
-                    }).start();
-
-                }
-            }
-        });
-
+        testing.execute();
 
     }
 
 
     public void accept(View v){
 
-        if(!aux){
-            managementDatabase = new ManagementDatabase();
-        }
-
-
-
-        if(managementDatabase.getNotification()!=null){
-
-            Toast.makeText(this,managementDatabase.getNotification(), Toast.LENGTH_LONG).show();
-
-            return;
-
-        }else {
-
-            new Thread(new Runnable() {
-                public void run() {
-                    managementDatabase.fillAllList();
-                    aux = true;
-                }
-            }).start();
-
-        }
-
-        if(managementDatabase.getNotification()!=null){
-            return;
-        }
-
-        while(!aux){
-
-        }
-        if(managementDatabase.verifyUser(editText_username.getText().toString(), editText_password.getText().toString())){
-            Intent i = new Intent(MainActivity.this, Pesas.class);
-            startActivity(i);
-        }else{
-            Toast.makeText(this, "El usuario o contraseña están incorrectos, intente de nuevo", Toast.LENGTH_LONG).show();
-        }
 
     }
 
@@ -122,6 +73,56 @@ public class MainActivity extends Activity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
+
+
+
+
+    private class Testing extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... args) {
+
+            Map<String, String> params = new HashMap<>();
+
+            HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+            JSONObject json = httpJsonParser.makeHttpRequest(DBCustomer.read(), "GET", params);
+
+            try {
+                /* Checking for SUCCESS TAG */
+                int success = json.getInt(TAG_SUCCESS);
+                if (success == 1) {
+                    JSONArray JAStuff = json.getJSONArray(TAG_STUFF);
+
+                    /** CHECK THE NUMBER OF RECORDS **/
+                    int intStuff = JAStuff.length();
+
+                    if (intStuff != 0) {
+
+                        for (int i = 0; i < JAStuff.length(); i++) {
+                            JSONObject JOStuff = JAStuff.getJSONObject(i);
+                            Log.e("ALL THE STUFF", JOStuff.toString());
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+    }
+
+
 
 
 }

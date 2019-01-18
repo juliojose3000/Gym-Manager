@@ -1,7 +1,5 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data;
 
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.ManagementDatabase;
-
 
 public class PaymentData {
 
