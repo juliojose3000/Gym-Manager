@@ -45,22 +45,10 @@ public class Morosos extends Activity {
 
         });
 
-        fillLisViewCustomers();
-    }
-
-
-
-    public void fillLisViewCustomers() {
-
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_list_item_checked,
-                CustomerData.getAllDefaulters());
-
-        listView_defaulterCustomers.setAdapter(arrayAdapter);
-        listView_defaulterCustomers.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
     }
+
+
 
 
     public void detailsBillToPay(View v){

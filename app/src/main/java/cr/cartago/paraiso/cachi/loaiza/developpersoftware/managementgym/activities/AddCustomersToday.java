@@ -20,17 +20,17 @@ import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.CustomerToday;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.DefaulterCustomer;
 
 public class AddCustomersToday extends Activity {
 
     private ListView listViewCustomers;
 
     private ArrayList<Customer> listCustomersForAddToday;
-
-    private int year, month, dayOfMonth;
-
-    private Calendar calendar;
 
     private boolean[] itemsChecked;
 
@@ -39,6 +39,10 @@ public class AddCustomersToday extends Activity {
     private ArrayList<Integer> customersId;
 
     private ThreadConnectionDB threadConnectionDB;
+
+    private Date date;
+
+    private int customerId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +55,9 @@ public class AddCustomersToday extends Activity {
 
         listViewCustomers = findViewById(R.id.listview_customers);
 
-        calendar = Calendar.getInstance();
+        date = new Date();
 
-        year = calendar.get(Calendar.YEAR);
-
-        month = calendar.get(Calendar.MONTH)+1;
-
-        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        listCustomersForAddToday = DBHelper.CUSTOMERS_FOR_ADD_TODAY;
 
         itemsChecked = new boolean[listCustomersForAddToday.size()];
 
@@ -90,7 +90,7 @@ public class AddCustomersToday extends Activity {
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_checked,
-                getNameAndLastNameFromListCustomer(listCustomersForAddToday) );
+                getNameAndLastNameFromListCustomer(listCustomersForAddToday));
 
         listViewCustomers.setAdapter(arrayAdapter);
         listViewCustomers.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -144,6 +144,70 @@ public class AddCustomersToday extends Activity {
 
     public void accept(View v){
 
+        if(!verifyInternetAccess()){
+            Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if(areAllFalse()){
+            Toast.makeText(this, "Seleccione al menos un cliente", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        customersId = new ArrayList<>();
+
+        for(int i = 0; i<listCustomersForAddToday.size(); i++){
+
+            if(itemsChecked[i]){
+
+                //obtengo el cliente de la posicion seleccionada en la lista y obtengo su id
+                customerId = listCustomersForAddToday.get(i).getCustomerId();
+                customersId.add(customerId);
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DBHelper.insertCustomersOfToday(customerId, date.getDateOfToday());
+                    }
+                }).start();
+
+                if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){// the customer doesn't have a current payment
+
+                    if(CustomerData.theCustomerIsDefaulter(customerId)){//if the customer already is defaulter, only increases the days to pay
+                        CustomerData.incrementDaysForPay(customerId);
+                    }else{//on the other hand, if the customer doesn't is defaulter, it to add in the defaulters list
+
+                        DBHelper.CUSTOMERS_DEFAULTERS.add(CustomerData.getCustomerById(customerId));
+
+                        CustomerData.incrementDaysForPay(customerId);
+                    }
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            DBHelper.insertCustomerDefaulter(customerId, date.getDateOfToday());//si el cliente ha llegado y no tiene un pago vigente que lo cubra, se agrega a morosos
+                        }
+                    }).start();
+
+
+                }
+            }
+        }
+
+
+        for(int i = 0; i<customersId.size(); i++){
+
+            DBHelper.CUSTOMERS_FOR_ADD_TODAY.remove(CustomerData.getCustomerById(customersId.get(i)));
+
+            DBHelper.CUSTOMERS_TODAY.add(CustomerData.getCustomerById(customersId.get(i)));
+
+        }
+
+        Toast.makeText(this, "Se han agregado los clientes que han llegado hoy", Toast.LENGTH_LONG).show();
+
+        Intent i = new Intent(AddCustomersToday.this, Pesas.class);
+
+        startActivity(i);
 
     }
 

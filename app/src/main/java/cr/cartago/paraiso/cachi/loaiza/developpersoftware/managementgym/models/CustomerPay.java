@@ -8,6 +8,14 @@ public class CustomerPay {
     private String payEnd;
     private String amountTime;
 
+    public CustomerPay(int customerPayId, int customerId, String payDate, String payEnd, String amountTime) {
+        this.customerPayId = customerPayId;
+        this.customerId = customerId;
+        this.payDate = payDate;
+        this.payEnd = payEnd;
+        this.amountTime = amountTime;
+    }
+
     public int getCustomerPayId() {
         return customerPayId;
     }

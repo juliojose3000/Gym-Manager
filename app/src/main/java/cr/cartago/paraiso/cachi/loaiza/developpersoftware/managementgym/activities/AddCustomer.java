@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
 public class AddCustomer extends Activity {
@@ -38,6 +39,15 @@ public class AddCustomer extends Activity {
     private Calendar calendar;
 
     private ThreadConnectionDB threadConnectionDB;
+
+
+    String name;
+
+    String lastname;
+
+    String startdate;
+
+    String nickname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,8 +92,6 @@ public class AddCustomer extends Activity {
 
         threadConnectionDB = new ThreadConnectionDB();
 
-        threadConnectionDB.start();
-
     }
 
 
@@ -100,6 +108,27 @@ public class AddCustomer extends Activity {
     }
 
     public void addCustomer(View v){
+
+        if(!verifyInternetAccess()){
+            Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        name = this.customerName.getText().toString();
+
+        lastname = this.customerLastname.getText().toString();
+
+        startdate = this.customerStartdate.getText().toString();
+
+        nickname = this.customerNickname.getText().toString();
+
+        if(customerName.equals("") || customerLastname.equals("") || customerStartdate.equals("")){
+            Toast.makeText(this, "Solo el campo 'Conocido como' no es indispensable. Complete los demás.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        threadConnectionDB.start();
+
 
 
     }
@@ -122,6 +151,7 @@ public class AddCustomer extends Activity {
     public class ThreadConnectionDB extends Thread{
         public void run()
         {
+            DBHelper.insertCustomer(name, lastname, startdate,nickname);
         }
     }
 

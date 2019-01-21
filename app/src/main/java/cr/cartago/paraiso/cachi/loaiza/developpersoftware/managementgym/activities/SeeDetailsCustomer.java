@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
 public class SeeDetailsCustomer extends Activity {
@@ -30,10 +31,6 @@ public class SeeDetailsCustomer extends Activity {
 
         customerId = extras.getInt("customer_id");
 
-        customer = CustomerData.getCustomerById(customerId);
-
-        isDefaulter = CustomerData.theCustomerIsDefaulter(customerId);
-
         String customerStatus;
 
         if(isDefaulter){
@@ -41,13 +38,6 @@ public class SeeDetailsCustomer extends Activity {
         }else{
             customerStatus = "El cliente está al día";
         }
-
-        if(CustomerData.customerHaveCurrentPayment(customerId)){
-
-
-
-        }
-
 
 
 
@@ -58,7 +48,7 @@ public class SeeDetailsCustomer extends Activity {
         if(!customer.getNickname().equals("")){
             customerDetails+="\n\nConocido(a) como: "+customer.getNickname();
         }
-        customerDetails+="\n\nInició el: "+CustomerData.getDateForShowUser(customer.getStarDate().toString())
+        customerDetails+="\n\nInició el: "+ Date.getDateForShowUser(customer.getStarDate().toString())
                 +"\n\n"+customerStatus;
 
         textView_customerDetails = findViewById(R.id.textView_customer_details);

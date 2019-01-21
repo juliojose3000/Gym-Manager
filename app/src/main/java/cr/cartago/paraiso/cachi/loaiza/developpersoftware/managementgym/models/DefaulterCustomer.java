@@ -6,6 +6,17 @@ public class DefaulterCustomer {
     private int customerId;
     private String dateArrived;
 
+    public DefaulterCustomer(int defaulterCustomerId, int customerId, String dateArrived) {
+        this.defaulterCustomerId = defaulterCustomerId;
+        this.customerId = customerId;
+        this.dateArrived = dateArrived;
+    }
+
+    public DefaulterCustomer(int customerId, String dateArrived) {
+        this.customerId = customerId;
+        this.dateArrived = dateArrived;
+    }
+
     public int getDefaulterCustomerId() {
         return defaulterCustomerId;
     }

@@ -12,11 +12,13 @@ public class Customer {
 
     private String nickname;
 
-    private Date starDate;
+    private String starDate;
 
     private int daysToPay;
 
-    public Customer(String name, String lastName, String nickname, Date starDate) {
+
+    public Customer(int customerId, String name, String lastName, String nickname, String starDate) {
+        this.customerId = customerId;
         this.name = name;
         this.lastName = lastName;
         this.nickname = nickname;
@@ -58,11 +60,11 @@ public class Customer {
         this.lastName = lastName;
     }
 
-    public Date getStarDate() {
+    public String getStarDate() {
         return starDate;
     }
 
-    public void setStarDate(Date starDate) {
+    public void setStarDate(String starDate) {
         this.starDate = starDate;
     }
 

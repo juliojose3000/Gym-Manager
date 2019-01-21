@@ -1,12 +1,13 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 
+import java.util.ArrayList;
+
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.CustomerPay;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.CustomerToday;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.DefaulterCustomer;
 
 public class CustomerData {
 
@@ -15,72 +16,8 @@ public class CustomerData {
 
     }
 
-    public static ArrayList<Customer> customerForAddToday(){
 
-        ArrayList<Customer> listCustomersForAddToday = new ArrayList<>();
 
-        for (Customer customer:
-                ManagementDatabase.listAllCustomer) {
-            if(!existsCustomerInCustomerOfToday(customer)){
-                listCustomersForAddToday.add(customer);
-            }
-        }
-
-        return listCustomersForAddToday;
-
-    }
-
-    public static boolean existsCustomerInCustomerOfToday(Customer customerToSearh){
-
-        for (Customer customer:
-                ManagementDatabase.listCustomersOfToday) {
-            if(customer.getCustomerId()==customerToSearh.getCustomerId()){
-                return true;
-            }
-        }
-        return false;
-
-    }
-
-    public static boolean theCustomerHaveCurrentPayment(int customerId){
-
-        for (Customer customer:
-                ManagementDatabase.listAllCustomerWithCurrentPayment) {
-            if(customer.getCustomerId()==customerId){
-                return true;
-            }
-        }
-        return false;
-
-    }
-
-    public static boolean theCustomerIsDefaulter(int customerId){
-
-        for (Customer customer:
-                ManagementDatabase.listAllDefaulterCustomers) {
-            if(customer.getCustomerId()==customerId){
-                return true;
-            }
-        }
-        return false;
-
-    }
-
-    public static Customer getCustomerById(int id){
-
-        Customer customer = null;
-
-        for (Customer currentCustomer:
-                ManagementDatabase.listAllCustomer) {
-            if(currentCustomer.getCustomerId()==id){
-                customer = currentCustomer;
-                break;
-            }
-        }
-
-        return customer;
-
-    }
 
     public static ArrayList<String> getNameAndLastNameFromListCustomer(ArrayList<Customer> listCustomers){
 
@@ -116,94 +53,6 @@ public class CustomerData {
 
     }
 
-    public static ArrayList<String> getAllDefaulters(){
-
-        ArrayList<String> listNamesAndLastNames = new ArrayList<>();
-
-        for (Customer customer:ManagementDatabase.listAllDefaulterCustomers) {
-
-            String cantDias="";
-
-            if(customer.getDaysToPay()==1){
-                cantDias=" día";
-            }else{
-                cantDias=" días";
-            }
-
-            listNamesAndLastNames.add(customer.getName()+" "+customer.getLastName()+": "+customer.getDaysToPay()+cantDias);
-
-        }
-
-        return listNamesAndLastNames;
-
-    }
-
-    public static void reduceBillToPayToCustomer(int customerId){
-
-        for (Customer customer:ManagementDatabase.listAllDefaulterCustomers) {
-
-            if(customer.getCustomerId()==customerId){
-
-                if(customer.getDaysToPay()==1){
-
-                    removeFromDefaulters(customerId);
-
-                    break;
-
-                }else{
-
-                    customer.setDaysToPay(customer.getDaysToPay()-1);
-
-                    break;
-
-                }
-            }
-
-        }
-
-    }
-
-    private static void removeFromDefaulters(int customerId){
-
-        for (int i = 0; i<ManagementDatabase.listAllDefaulterCustomers.size(); i++) {
-            Customer customer = ManagementDatabase.listAllDefaulterCustomers.get(i);
-            if(customer.getCustomerId()==customerId){
-                ManagementDatabase.listAllDefaulterCustomers.remove(i);
-            }
-        }
-
-    }
-
-    public static Payment getDetailsCustomerPayment(int customerId){
-
-        Payment payment = null;
-
-        for (Payment currentPayment:
-                ManagementDatabase.listCustomersWithPaymentStillInForse) {
-            if(currentPayment.getCustomerId()==customerId){
-                payment = currentPayment;
-                break;
-            }
-        }
-
-        return payment;
-
-
-    }
-
-    public static boolean customerHaveCurrentPayment(int customerId){
-
-        for (Payment currentPayment:
-                ManagementDatabase.listCustomersWithPaymentStillInForse) {
-            if(currentPayment.getCustomerId()==customerId){
-                return true;
-            }
-        }
-
-        return false;
-
-
-    }
 
     public static ArrayList<Customer> customerToSearch(String customerToSearch, ArrayList<Customer> customers){
 
@@ -243,60 +92,47 @@ public class CustomerData {
         return false;
     }
 
-    public static String getDateForShowUser(String date){
+    public static boolean theCustomerHaveCurrentPayment(int customerId){
 
-        String[] dateParts = date.split("-");
-
-        String day = dateParts[2];
-
-        String month = getMonthByNum(Integer.parseInt(dateParts[1])-1);
-
-        String year = dateParts[0];
-
-        return day+" "+month+" "+year;
-
-    }
-
-    public static String getMonthByNum(int i){
-        String[] months = {"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dec"};
-        return months[i];
-    }
-
-    public static String getDateForDB(String date){
-
-        if(date.contains(",")){
-            String[] newDate = date.split(",");
-            date = newDate[1].substring(1);
-        }
-
-        String[] dateParts = date.split(" ");
-
-        String day = dateParts[0];
-
-        String month = getNumByMonth(dateParts[1]);
-
-        String year = dateParts[2];
-
-        return year+"-"+month+"-"+day;
-    }
-
-    private static String getNumByMonth(String month){
-
-        String[] months = {"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dec"};
-
-        for(int i = 0; i< months.length; i++){
-            if(months[i].equals(month)){
-                return ""+(++i);
+        for (Customer customer:
+                DBHelper.CUSTOMERS_WITH_CURRENT_PAYMENT) {
+            if(customer.getCustomerId()==customerId){
+                return true;
             }
         }
+        return false;
 
-        return "";
+    }
+
+
+    public static boolean existsCustomerInCustomerOfToday(Customer customerToSearh){
+
+        for (Customer customer:
+                DBHelper.CUSTOMERS_TODAY) {
+            if(customer.getCustomerId()==customerToSearh.getCustomerId()){
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    public static boolean theCustomerIsDefaulter(int customerId){
+
+        for (Customer customer:
+                DBHelper.CUSTOMERS_DEFAULTERS) {
+            if(customer.getCustomerId()==customerId){
+                return true;
+            }
+        }
+        return false;
+
     }
 
     public static void incrementDaysForPay(int customerId){
 
         for (Customer customer:
-             ManagementDatabase.listAllDefaulterCustomers) {
+                DBHelper.CUSTOMERS) {
             if(customer.getCustomerId()==customerId){
                 customer.setDaysToPay(customer.getDaysToPay()+1);
             }
@@ -304,37 +140,20 @@ public class CustomerData {
 
     }
 
-    public static String getDayName(String inputDate){
+    public static Customer getCustomerById(int id){
 
-        String[] dayNames = {"Lunes","Martes","Miércoles","Jueves", "Viernes", "Sábado", "Domingo"};
+        Customer customer = null;
 
-        Date date = null;
-        try {
-            date = new SimpleDateFormat("yyyy-MM-dd").parse(inputDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
+        for (Customer currentCustomer:
+                DBHelper.CUSTOMERS) {
+            if(currentCustomer.getCustomerId()==id){
+                customer = currentCustomer;
+                break;
+            }
         }
 
-        String day = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(date);
+        return customer;
 
-        if(day.equals("Monday")){
-            return dayNames[0];
-        }else if(day.equals("Tuesday")){
-            return dayNames[1];
-        }else if(day.equals("Wednesday")){
-            return dayNames[2];
-        }else if(day.equals("Thursday")){
-            return dayNames[3];
-        }else if(day.equals("Friday")){
-            return dayNames[4];
-        }else if(day.equals("Saturday")){
-            return dayNames[5];
-        }else if(day.equals("Sunday")){
-            return dayNames[6];
-        }
-
-        return "";
     }
-
 
 }

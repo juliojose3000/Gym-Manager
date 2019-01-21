@@ -6,20 +6,19 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activities.Pesas;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBCustomer;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.HttpJsonParser;
 
 public class MainActivity extends Activity {
@@ -28,11 +27,9 @@ public class MainActivity extends Activity {
 
     private EditText editText_username;
 
-    private Testing testing;
+    private DBHelper dbHelper;
 
-    String TAG_SUCCESS = "success";
-
-    String TAG_STUFF = "stuff";
+    private Test test;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,16 +42,21 @@ public class MainActivity extends Activity {
 
         editText_username = findViewById(R.id.username);
 
-        testing = new Testing();
+        test = new Test();
 
-        testing.execute();
-
+        try {
+            test.execute().get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 
     public void accept(View v){
-
-
+        Intent i = new Intent(MainActivity.this, Pesas.class);
+        startActivity(i);
     }
 
     public void cancel(View v){
@@ -75,9 +77,17 @@ public class MainActivity extends Activity {
     }
 
 
+    private class Test extends AsyncTask<Void, Void, Void>{
 
+        @Override
+        protected Void doInBackground(Void... voids) {
+            dbHelper = new DBHelper();
 
-    private class Testing extends AsyncTask<Void, Void, Void> {
+            return null;
+        }
+    }
+
+  /*  private class Testing extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
@@ -91,15 +101,15 @@ public class MainActivity extends Activity {
 
             HttpJsonParser httpJsonParser = new HttpJsonParser();
 
-            JSONObject json = httpJsonParser.makeHttpRequest(DBCustomer.read(), "GET", params);
+            JSONObject json = httpJsonParser.makeHttpRequest(DBCustomer.URL_Read(), "GET", params);
 
             try {
-                /* Checking for SUCCESS TAG */
+                // Checking for SUCCESS TAG
                 int success = json.getInt(TAG_SUCCESS);
                 if (success == 1) {
                     JSONArray JAStuff = json.getJSONArray(TAG_STUFF);
 
-                    /** CHECK THE NUMBER OF RECORDS **/
+                    // CHECK THE NUMBER OF RECORDS
                     int intStuff = JAStuff.length();
 
                     if (intStuff != 0) {
@@ -121,7 +131,7 @@ public class MainActivity extends Activity {
             super.onPostExecute(aVoid);
         }
     }
-
+*/
 
 
 

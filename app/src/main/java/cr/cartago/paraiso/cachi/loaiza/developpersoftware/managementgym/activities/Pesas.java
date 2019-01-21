@@ -22,17 +22,12 @@ import java.util.Calendar;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.MainActivity;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
 public class Pesas extends Activity {
 
     private ListView listViewCustomers;
-
-    private ArrayList<Customer> listCustomers;
-
-    private int year, month, dayOfMonth;
-
-    private Calendar calendar;
 
     private Customer customerCurrentSelected;
 
@@ -45,28 +40,18 @@ public class Pesas extends Activity {
 
         listViewCustomers = findViewById(R.id.listview_come_customers);
 
-        calendar = Calendar.getInstance();
-
-        year = calendar.get(Calendar.YEAR);
-
-        month = calendar.get(Calendar.MONTH)+1;
-
-        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-
-        listCustomers = new ArrayList<>();
-
         listViewCustomers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                customerCurrentSelected = listCustomers.get(position);
+                customerCurrentSelected = DBHelper.CUSTOMERS_TODAY.get(position);
 
             }
 
         });
 
 
-        listViewCustomers.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_checked, CustomerData.getNameAndLastNameFromListCustomer(listCustomers)) {
+        listViewCustomers.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_checked, CustomerData.getNameAndLastNameFromListCustomer(DBHelper.CUSTOMERS_TODAY)) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View row = super.getView(position, convertView, parent);

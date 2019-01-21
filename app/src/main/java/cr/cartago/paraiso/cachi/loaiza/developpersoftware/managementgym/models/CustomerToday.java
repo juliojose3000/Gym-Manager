@@ -6,6 +6,17 @@ public class CustomerToday {
     private int customerId;
     private String dateArrived;
 
+    public CustomerToday(int customerTodayId, int customerId, String dateArrived) {
+        this.customerTodayId = customerTodayId;
+        this.customerId = customerId;
+        this.dateArrived = dateArrived;
+    }
+
+    public CustomerToday(int customerId, String dateArrived) {
+        this.customerId = customerId;
+        this.dateArrived = dateArrived;
+    }
+
     public int getCustomerTodayId() {
         return customerTodayId;
     }

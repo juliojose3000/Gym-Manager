@@ -6,77 +6,224 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.CustomerPay;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.CustomerToday;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.DefaulterCustomer;
+
 /**
  * Created by Jay on 06-06-2017.
  */
 
-public class DBHelper extends SQLiteOpenHelper {
+public class DBHelper  {
 
-    private static DBHelper dbHelper = null;
-    private Context context;
-    private static final int DATABASE_VERSION = 1;
+    public static String REST_API_PHP_URL = "http://192.168.1.6/proyectos_web/AppGym/CachiFitnessCenter%20REST%20API%20PHP/php_rest_cachi_fitness_center/api/";
 
-    private static final String CREATE_TABLE = "create table "+ DBCustomer.TABLE_NAME+
-            "(id integer primary key autoincrement,"+ DBCustomer.CUSTOMER_NAME+" text,"+ DBCustomer.CUSTOMER_LASTNAME+" text,"
-            + DBCustomer.CUSTOMER_ID+" integer);";
+    public static ArrayList<Customer> CUSTOMERS;
+    public static ArrayList<Customer> CUSTOMERS_TODAY;
+    public static ArrayList<Customer> CUSTOMERS_FOR_ADD_TODAY;
+    public static ArrayList<Customer> CUSTOMERS_WITH_CURRENT_PAYMENT;
+    public static ArrayList<Customer> CUSTOMERS_DEFAULTERS;
 
-    private static final String DROP_TABLE = "drop table if exists "+ DBCustomer.TABLE_NAME;
+    private Date date;
 
-    private DBHelper(Context context)
-    {
-        super(context, DBCustomer.DB_NAME,null,DATABASE_VERSION);
-        this.context = context;
-    }
 
-    public static DBHelper getInstance(Context context) {
-        /**
-         * use the application context as suggested by CommonsWare.
-         * this will ensure that you dont accidentally leak an Activitys
-         * context (see this article for more information:
-         * http://developer.android.com/resources/articles/avoiding-memory-leaks.html)
-         */
-        if (dbHelper == null) {
-            dbHelper = new DBHelper(context);
+    public DBHelper(){
+        CUSTOMERS = new ArrayList<>();
+        CUSTOMERS_TODAY = new ArrayList<>();
+        CUSTOMERS_FOR_ADD_TODAY = new ArrayList<>();
+        CUSTOMERS_WITH_CURRENT_PAYMENT = new ArrayList<>();
+        CUSTOMERS_DEFAULTERS = new ArrayList<>();
+
+        date = new Date();
+
+        try {
+            getAllCustomers();
+            getAllCustomersToday(date.getDateOfToday());
+            getAllCustomersWithCurrentPayment(date.getDateOfToday());
+            getAllCustomersDefaulters();
+            getCustomerForAddToday();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        return dbHelper;
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_TABLE);
+    public void getAllCustomers() throws JSONException {
+
+        JSONObject jsonObject;
+
+        Customer customer;
+
+        Map<String, String> params = new HashMap<>();
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+        JSONArray jsonArray =  httpJsonParser.getJson(DBCustomer.URL_Read(), params);
+
+        for(int i=0; i<jsonArray.length(); i++)
+        {
+            jsonObject=jsonArray.getJSONObject(i);
+            int customerId = jsonObject.getInt("customer_id");
+            String customerName = jsonObject.getString("customer_name");
+            String customerLastname = jsonObject.getString("customer_lastname");
+            String startDate = jsonObject.getString("start_date");
+            String customerNickname = jsonObject.getString("customer_nickname");
+
+            customer = new Customer(customerId, customerName, customerLastname, startDate, customerNickname);
+
+            CUSTOMERS.add(customer);
+
+        }
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(DROP_TABLE);
-        onCreate(db);
+    public void getAllCustomersToday(String date) throws JSONException {
+
+        Map<String, String> params = new HashMap<>();
+
+        params.put("date_arrived",date);
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+        JSONArray jsonArray =  httpJsonParser.getJson(DBCustomerToday.URL_In_Specific_Date(), params);
+
+        for(int i=0; i<jsonArray.length(); i++)
+        {
+            JSONObject jsonObject=jsonArray.getJSONObject(i);
+
+            int customerId = jsonObject.getInt("customer_id");
+
+            CUSTOMERS_TODAY.add(CustomerData.getCustomerById(customerId));
+
+        }
     }
 
-    //  Save info for local Database(SQLite Database)
-    public void SaveToLocalDatabase(String Name, String Email, int Sync_Status, SQLiteDatabase database){
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DBCustomer.CUSTOMER_NAME,Name);
-        contentValues.put(DBCustomer.CUSTOMER_LASTNAME,Email);
-        contentValues.put(DBCustomer.CUSTOMER_ID,Sync_Status);
-        //  Insert Data into SQlite Database
-        database.insert(DBCustomer.TABLE_NAME,null,contentValues);
+    public void getAllCustomersWithCurrentPayment(String date) throws JSONException {
+
+        Map<String, String> params = new HashMap<>();
+
+        params.put("date_arrived",date);
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+        JSONArray jsonArray =  httpJsonParser.getJson(DBCustomerPay.URL_Read(), params);
+
+        for(int i=0; i<jsonArray.length(); i++)
+        {
+            JSONObject jsonObject=jsonArray.getJSONObject(i);
+            int customerId = jsonObject.getInt("customer_id");
+            String customerName = jsonObject.getString("customer_name");
+            String customerLastname = jsonObject.getString("customer_lastname");
+            String startDate = jsonObject.getString("start_date");
+            String customerNickname = jsonObject.getString("customer_nickname");
+
+            Customer customer = new Customer(customerId, customerName, customerLastname, startDate, customerNickname);
+
+            CUSTOMERS_WITH_CURRENT_PAYMENT.add(customer);
+
+        }
+
     }
 
-    // Read Info from SQLiteDatabse(SQLite Database)
-    public Cursor ReadFromLocalDatabase(SQLiteDatabase database){
+    public static void insertCustomer(String name, String lastname, String dateStart, String nickname){
 
-        //  Coloumn Names for reading data from
-        String[] Projection = {DBCustomer.CUSTOMER_NAME, DBCustomer.CUSTOMER_LASTNAME, DBCustomer.CUSTOMER_ID};
-        return (database.query(DBCustomer.TABLE_NAME,Projection,null,null,null,null,null));
+        Map<String, String> params = new HashMap<>();
+
+        params.put("customer_name",name);
+        params.put("customer_lastname",lastname);
+        params.put("start_date",dateStart);
+        params.put("customer_nickname",nickname);
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+        //httpJsonParser.makeHttpRequest(DBCustomer.URL_Create(), "POST", params);
+        try {
+            httpJsonParser.sendJson(DBCustomer.URL_Create(), params);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
-    //  Update SQLite Database(SQLite Database)
-    public void UpdataLocalDatabase(String Name, String Email, int Sync_Status, SQLiteDatabase database){
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DBCustomer.CUSTOMER_ID, Sync_Status);
-		//	Update SyncStatus Based on Name and Email
-		String Selection = DBCustomer.CUSTOMER_NAME + " = ? AND " + DBCustomer.CUSTOMER_LASTNAME + " = ?";
-        String[] selection_args = {Name, Email};
-        database.update(DBCustomer.TABLE_NAME, contentValues, Selection, selection_args);
+    public static void insertCustomersOfToday(int customerId,String today){
+
+        Map<String, String> params = new HashMap<>();
+
+        params.put("customer_id",""+customerId);
+        params.put("date_arrived",today);
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+        try {
+            httpJsonParser.sendJson(DBCustomerToday.URL_Create(), params);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
+
+    public void getAllCustomersDefaulters() throws JSONException {
+
+        Map<String, String> params = new HashMap<>();
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+        JSONArray jsonArray =  httpJsonParser.getJson(DBDefaulterCustomer.URL_Read(), params);
+
+        for(int i=0; i<jsonArray.length(); i++)
+        {
+            JSONObject jsonObject=jsonArray.getJSONObject(i);
+
+            int customerId = jsonObject.getInt("customer_id");
+
+            CUSTOMERS_DEFAULTERS.add(CustomerData.getCustomerById(customerId));
+
+        }
+    }
+
+    public static void insertCustomerDefaulter(int customerId, String date){
+
+        Map<String, String> params = new HashMap<>();
+
+        params.put("customer_id",""+customerId);
+        params.put("arrived_date",date);
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+        try {
+            httpJsonParser.sendJson(DBDefaulterCustomer.URL_Create(), params);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void getCustomerForAddToday(){
+
+        for (Customer customer:
+                DBHelper.CUSTOMERS) {
+            if(!CustomerData.existsCustomerInCustomerOfToday(customer)){
+                CUSTOMERS_FOR_ADD_TODAY.add(customer);
+            }
+        }
+
+    }
+
+
 }

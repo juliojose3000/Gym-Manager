@@ -15,6 +15,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
 public class AllCustomers extends Activity {
@@ -73,7 +74,7 @@ public class AllCustomers extends Activity {
 
         ArrayList<String> listNamesAndLastNames = new ArrayList<>();
 
-        for (Customer customer:listCustomers) {
+        for (Customer customer: DBHelper.CUSTOMERS) {
 
             listNamesAndLastNames.add(customer.getName()+" "+customer.getLastName());
 

@@ -18,6 +18,7 @@ import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
 
 public class AddPayment extends Activity {
 
@@ -115,9 +116,9 @@ public class AddPayment extends Activity {
 
         endDayOfMonth = dayOfMonth;
 
-        String fechaPago = CustomerData.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
+        String fechaPago = Date.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
 
-        String dayName = CustomerData.getDayName(year+"-"+month+"-"+dayOfMonth);
+        String dayName = Date.getDayName(year+"-"+month+"-"+dayOfMonth);
 
         paymentDetails = "Cliente: "+customerName+"\nFecha de pago: "+dayName+", "+fechaPago+"\nDuración: "+duracion;
 
@@ -151,13 +152,13 @@ public class AddPayment extends Activity {
 
         endMonth = calendar.get(Calendar.MONTH)+1;
 
-        String startDate = CustomerData.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
+        String startDate = Date.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
 
-        String startDayName =CustomerData.getDayName(year+"-"+month+"-"+dayOfMonth);
+        String startDayName =Date.getDayName(year+"-"+month+"-"+dayOfMonth);
 
-        String endDate = CustomerData.getDateForShowUser(year+"-"+endMonth+"-"+endDayOfMonth);
+        String endDate = Date.getDateForShowUser(year+"-"+endMonth+"-"+endDayOfMonth);
 
-        String endDayName = CustomerData.getDayName(year+"-"+endMonth+"-"+endDayOfMonth);
+        String endDayName = Date.getDayName(year+"-"+endMonth+"-"+endDayOfMonth);
 
         paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+startDayName+", "+startDate+
                 "\nhasta el: "+endDayName+", "+endDate+"\nDuración: "+duracion;
@@ -185,13 +186,13 @@ public class AddPayment extends Activity {
 
         dayOfMonth  = 1;
 
-        String startDate = CustomerData.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
+        String startDate = Date.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
 
-        String startDayName =CustomerData.getDayName(year+"-"+month+"-"+dayOfMonth);
+        String startDayName =Date.getDayName(year+"-"+month+"-"+dayOfMonth);
 
-        String endDate = CustomerData.getDateForShowUser(year+"-"+endMonth+"-"+endDayOfMonth);
+        String endDate = Date.getDateForShowUser(year+"-"+endMonth+"-"+endDayOfMonth);
 
-        String endDayName = CustomerData.getDayName(year+"-"+endMonth+"-"+endDayOfMonth);
+        String endDayName = Date.getDayName(year+"-"+endMonth+"-"+endDayOfMonth);
 
         paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+startDayName+", "+startDate+
                 "\nhasta el: "+endDayName+", "+endDate+"\nDuración: "+duracion;
