@@ -7,18 +7,24 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.concurrent.ExecutionException;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Payment;
 
 public class AddPayment extends Activity {
 
@@ -32,19 +38,15 @@ public class AddPayment extends Activity {
 
     private int customerId;
 
-    private int year, month, dayOfMonth;
-
-    private int endYear, endMonth, endDayOfMonth;
-
     private String duracion;
-
-    private Calendar calendar;
 
     private Button dayButton, weekButton, monthButton;
 
-    private ThreadConnectionDB threadConnectionDB;
+    private Date date;
 
-    private ThreadFillAllList threadFillAllList;
+    private String startDate;
+
+    private String endDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,25 +67,13 @@ public class AddPayment extends Activity {
 
         customerId = extras.getInt("customer_id");
 
-        calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
-
-        year = calendar.get(Calendar.YEAR);
-
-        month = calendar.get(Calendar.MONTH)+1;
+        date = new Date();
 
         textView_customerName = findViewById(R.id.textView_payment_customer);
 
         textView_paymentDetails = findViewById(R.id.textView_payment_details);
 
         textView_customerName.setText("Agregar un pago a "+customerName);
-
-        threadConnectionDB = new ThreadConnectionDB();
-
-        threadFillAllList = new ThreadFillAllList();
-
-        threadConnectionDB.start();
 
     }
 
@@ -104,23 +94,13 @@ public class AddPayment extends Activity {
 
     public void day(View v){
 
-        duracion = "un día";
+        duracion = "un dia";
 
-        Calendar calendar = Calendar.getInstance();
+        startDate = date.getDateOfToday();
 
-        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        endDate = startDate;
 
-        endYear = calendar.get(Calendar.YEAR);
-
-        endMonth = calendar.get(Calendar.MONTH)+1;
-
-        endDayOfMonth = dayOfMonth;
-
-        String fechaPago = Date.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
-
-        String dayName = Date.getDayName(year+"-"+month+"-"+dayOfMonth);
-
-        paymentDetails = "Cliente: "+customerName+"\nFecha de pago: "+dayName+", "+fechaPago+"\nDuración: "+duracion;
+        paymentDetails = "Cliente: "+customerName+"\nCubre hoy: "+Date.getDateForShowUser(startDate)+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
@@ -132,36 +112,12 @@ public class AddPayment extends Activity {
 
         duracion = "una semana";
 
-        Calendar calendar = Calendar.getInstance();
+        startDate = date.getDateForDB(date.getDateOfFirstDayInTheWeek());
 
-        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+        endDate = date.getDateForDB(date.getDateOfLastDayInTheWeek());
 
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
-
-        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-
-        month = calendar.get(Calendar.MONTH)+1;
-
-        year = calendar.get(Calendar.YEAR);
-
-        calendar.add(Calendar.DAY_OF_YEAR, 6);
-
-        endDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-
-        endYear = calendar.get(Calendar.YEAR);
-
-        endMonth = calendar.get(Calendar.MONTH)+1;
-
-        String startDate = Date.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
-
-        String startDayName =Date.getDayName(year+"-"+month+"-"+dayOfMonth);
-
-        String endDate = Date.getDateForShowUser(year+"-"+endMonth+"-"+endDayOfMonth);
-
-        String endDayName = Date.getDayName(year+"-"+endMonth+"-"+endDayOfMonth);
-
-        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+startDayName+", "+startDate+
-                "\nhasta el: "+endDayName+", "+endDate+"\nDuración: "+duracion;
+        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+date.getDateOfFirstDayInTheWeek()+
+                "\nhasta el: "+date.getDateOfLastDayInTheWeek()+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
@@ -173,29 +129,12 @@ public class AddPayment extends Activity {
 
         duracion = "un mes";
 
-        Calendar calendar = Calendar.getInstance();
+        startDate = date.getDateForDB(date.getDateOfTheFirstDayInTheCurrentMonth());
 
-        //calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        endDate = date.getDateForDB(date.getDateOfTheLastDayInTheCurrentMonth());
 
-        endYear = calendar.get(Calendar.YEAR);
-
-        endMonth = calendar.get(Calendar.MONTH)+1;
-
-        endDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-
-        dayOfMonth  = 1;
-
-        String startDate = Date.getDateForShowUser(year+"-"+month+"-"+dayOfMonth);
-
-        String startDayName =Date.getDayName(year+"-"+month+"-"+dayOfMonth);
-
-        String endDate = Date.getDateForShowUser(year+"-"+endMonth+"-"+endDayOfMonth);
-
-        String endDayName = Date.getDayName(year+"-"+endMonth+"-"+endDayOfMonth);
-
-        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+startDayName+", "+startDate+
-                "\nhasta el: "+endDayName+", "+endDate+"\nDuración: "+duracion;
+        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+date.getDateOfTheFirstDayInTheCurrentMonth()+
+                "\nhasta el: "+date.getDateOfTheLastDayInTheCurrentMonth()+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
@@ -221,24 +160,49 @@ public class AddPayment extends Activity {
 
     public void accept(View v){
 
-
-
-    }
-
-
-    public class ThreadConnectionDB extends Thread{
-        public void run()
-        {
-
+        if(!verifyInternetAccess()){
+            Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
+            return;
         }
-    }
 
-
-    public class ThreadFillAllList extends Thread{
-        public void run()
-        {
-
+        if(paymentDetails==null){
+            Toast.makeText(this,"Seleccione la cantidad de tiempo", Toast.LENGTH_LONG).show();
+            return;
         }
+
+        if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){//el cliente no tiene un pago vigente
+
+            new Thread(){
+                public void run(){
+                    DBHelper.addPaymentFromCustomer(customerId, startDate, endDate, duracion);
+                    DBHelper.CUSTOMER_PAYMENTS.add(new Payment(customerId, startDate, endDate, duracion));
+                    DBHelper.CUSTOMERS_WITH_CURRENT_PAYMENT.add(CustomerData.getCustomerById(customerId));
+                }
+            }.start();
+
+
+            if(CustomerData.theCustomerIsDefaulter(customerId)){//If the customer is defaulter, so delete the days covered by the payment
+
+                new Thread(){
+                    public void run(){
+                        DBHelper.deleteDaysForPayByCoveredPay(customerId, startDate);
+                        try {
+                            DBHelper.getAllCustomersDefaulters();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+
+            }
+            disabilityButtons();
+            Toast.makeText(this, "Se agregó el pago correctamente", Toast.LENGTH_LONG).show();
+
+
+        }else{
+            Toast.makeText(this, customerName+" tiene un pago todavía vigente", Toast.LENGTH_LONG).show();
+        }
+
     }
 
 
@@ -253,6 +217,22 @@ public class AddPayment extends Activity {
         monthButton.setEnabled(false);
         dayButton.setEnabled(false);
         weekButton.setEnabled(false);
+    }
+
+
+    public class AddPaymentFromCustomer extends Thread{
+        public void run()
+        {
+        }
+    }
+
+    private class Test extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+            DBHelper.addPaymentFromCustomer(customerId, startDate, endDate, duracion);
+            return null;
+        }
     }
 
 

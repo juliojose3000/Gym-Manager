@@ -1,12 +1,16 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activities.Pesas;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBCustomer;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.HttpJsonParser;
@@ -27,9 +32,9 @@ public class MainActivity extends Activity {
 
     private EditText editText_username;
 
-    private DBHelper dbHelper;
+    private Thread thread;
 
-    private Test test;
+    private boolean theConnectionWasSuccessful;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,21 +47,48 @@ public class MainActivity extends Activity {
 
         editText_username = findViewById(R.id.username);
 
-        test = new Test();
-
-        try {
-            test.execute().get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if(verifyInternetAccess()){
+            thread = new Thread(){
+                public void run(){
+                    new DBHelper();
+                }
+            };
+            thread.start();
+            theConnectionWasSuccessful = true;
+        }else{
+            Toast.makeText(this,"Verifique su conexión a internet", Toast.LENGTH_LONG).show();
+            theConnectionWasSuccessful = false;
         }
+
     }
 
 
     public void accept(View v){
-        Intent i = new Intent(MainActivity.this, Pesas.class);
-        startActivity(i);
+
+        if(!verifyInternetAccess()){
+            Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if(!theConnectionWasSuccessful){
+            thread = new Thread(){
+                public void run(){
+                    new DBHelper();
+                }
+            };
+            thread.start();
+
+        }
+
+        while (thread.isAlive()){}
+
+        if(CustomerData.verifyPartner(editText_username.getText().toString(), editText_password.getText().toString())){
+            Intent i = new Intent(MainActivity.this, Pesas.class);
+            startActivity(i);
+        }else{
+            Toast.makeText(this,"Usuario o contraseña incorrectos, intente de nuevo", Toast.LENGTH_LONG).show();
+        }
+
     }
 
     public void cancel(View v){
@@ -76,16 +108,21 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
+    public boolean verifyInternetAccess(){
 
-    private class Test extends AsyncTask<Void, Void, Void>{
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            dbHelper = new DBHelper();
+        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
 
-            return null;
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            return true;
         }
+        else
+            return false;
+
     }
+
 
   /*  private class Testing extends AsyncTask<Void, Void, Void> {
 

@@ -14,12 +14,16 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
 public class CustomersArrivedInSpecificDay extends Activity {
@@ -39,8 +43,6 @@ public class CustomersArrivedInSpecificDay extends Activity {
     private ArrayList<Customer> customersInDate;
 
     private ArrayList<String> customers;
-
-    private ThreadConnectionDB threadConnectionDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,13 +101,45 @@ public class CustomersArrivedInSpecificDay extends Activity {
 
         });
 
-        threadConnectionDB = new ThreadConnectionDB();
-
-        threadConnectionDB.start();
-
     }
 
-    private void onClickInSpecificDate(int year, int month, int dayOfMonth){
+    private void onClickInSpecificDate(final int year,final int month,final int dayOfMonth){
+
+        if(!verifyInternetAccess()){
+            Toast.makeText(CustomersArrivedInSpecificDay.this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        String date = Date.getDateForShowUser(year + "-" + (month+1) + "-" + dayOfMonth);
+
+        dateArrivedCustomers.setText(date);
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    customersInDate = DBHelper.customerInSpecificDate(year + "-" + (month+1) + "-" + dayOfMonth);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        t.start();
+
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        customers = CustomerData.getNameAndLastNameFromListCustomerInSpecificDay(customersInDate);
+
+        if(customers.size()==0){
+            Toast.makeText(this, "Nadie llegó en esta fecha",Toast.LENGTH_LONG).show();
+        }
+
+        fillLisViewCustomers();
 
     }
 
@@ -135,14 +169,6 @@ public class CustomersArrivedInSpecificDay extends Activity {
         else
             return false;
 
-    }
-
-
-    public class ThreadConnectionDB extends Thread{
-        public void run()
-        {
-
-        }
     }
 
 

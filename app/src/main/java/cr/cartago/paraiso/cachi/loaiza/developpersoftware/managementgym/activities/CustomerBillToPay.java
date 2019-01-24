@@ -13,18 +13,21 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 
 public class CustomerBillToPay extends Activity {
 
     private ArrayList<String> listBillToPayOfCustomer;
 
     private ListView listView_billToPay;
-
 
     private int customerId;
 
@@ -37,8 +40,6 @@ public class CustomerBillToPay extends Activity {
     private int pos;
 
     private ArrayAdapter<String> arrayAdapter;
-
-    private ThreadConnectionDB threadConnectionDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +58,27 @@ public class CustomerBillToPay extends Activity {
 
         title.setText("Días que ha llegado "+customerName+" sin pagar:");
 
+        Thread t = new Thread(){
+            public void run(){
+                try {
+                    listBillToPayOfCustomer = DBHelper.getListAllBillToPay(customerId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        t.start();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_checked,
-                listBillToPayOfCustomer );
+                listBillToPayOfCustomer);
 
         listView_billToPay.setAdapter(arrayAdapter);
         listView_billToPay.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -77,18 +95,76 @@ public class CustomerBillToPay extends Activity {
 
         });
 
-        threadConnectionDB = new ThreadConnectionDB();
-
-        threadConnectionDB.start();
-
     }
 
     public void cancelBillToPay(View v){
 
+        if(!verifyInternetAccess()){
+            Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if(dateBillToPay==null){
+            Toast.makeText(this,"Seleccione una fecha", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+
+        //boolean wasCanceled = DBHelper.cancelBillToPay(customerId, Date.getDateForDB(dateBillToPay));
+
+        new Thread(){
+            public void run(){
+                DBHelper.cancelBillToPay(customerId, Date.getDateForDB(dateBillToPay));
+            }
+        }.start();
+
+        boolean wasCanceled = true;
+
+        if(wasCanceled){
+
+            Toast.makeText(CustomerBillToPay.this,"Se ha cancelado el día con éxito", Toast.LENGTH_LONG).show();
+
+            CustomerData.reduceBillToPayToCustomer(customerId);
+
+            listBillToPayOfCustomer.remove(pos);
+
+            arrayAdapter.notifyDataSetChanged();
+
+            listView_billToPay.clearChoices();
+
+        }
 
     }
 
     public void cancelAllBillToPay(View v){
+
+        if(!verifyInternetAccess()){
+            Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        //boolean wasCanceled = managementDatabase.cancelAllBillToPay(customerId);
+
+        new Thread(){
+            public void run(){
+                DBHelper.cancelAllBillToPay(customerId);
+            }
+        }.start();
+
+        boolean wasCanceled = true;
+
+        if(wasCanceled){
+
+            Toast.makeText(CustomerBillToPay.this,"Se ha eliminado toda la deuda seleccinada con éxito", Toast.LENGTH_LONG).show();
+
+            listBillToPayOfCustomer.removeAll(listBillToPayOfCustomer);
+
+            CustomerData.removeFromDefaulters(customerId);
+
+            arrayAdapter.notifyDataSetChanged();
+
+        }
+
 
 
     }
@@ -114,11 +190,5 @@ public class CustomerBillToPay extends Activity {
 
     }
 
-    public class ThreadConnectionDB extends Thread{
-        public void run()
-        {
-
-        }
-    }
 
 }

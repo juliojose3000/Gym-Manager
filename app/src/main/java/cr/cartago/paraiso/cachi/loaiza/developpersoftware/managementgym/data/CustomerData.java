@@ -5,9 +5,8 @@ import java.util.ArrayList;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.CustomerPay;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.CustomerToday;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.DefaulterCustomer;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Partner;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Payment;
 
 public class CustomerData {
 
@@ -155,5 +154,91 @@ public class CustomerData {
         return customer;
 
     }
+
+    public static Payment getDetailsCustomerPayment(int customerId){
+
+        Payment payment = null;
+
+        for (Payment currentPayment:
+                DBHelper.CUSTOMER_PAYMENTS) {
+            if(currentPayment.getCustomerId()==customerId){
+                payment = currentPayment;
+                break;
+            }
+        }
+
+        return payment;
+    }
+
+    public static ArrayList<String> getAllDefaulters(){
+
+        ArrayList<String> listNamesAndLastNames = new ArrayList<>();
+
+        for (Customer customer:DBHelper.CUSTOMERS_DEFAULTERS) {
+
+            String cantDias="";
+
+            if(customer.getDaysToPay()==1){
+                cantDias=" día";
+            }else{
+                cantDias=" días";
+            }
+
+            listNamesAndLastNames.add(customer.getName()+" "+customer.getLastName()+": "+customer.getDaysToPay()+cantDias);
+
+        }
+
+        return listNamesAndLastNames;
+
+    }
+
+    public static void reduceBillToPayToCustomer(int customerId){
+
+        for (Customer customer:DBHelper.CUSTOMERS_DEFAULTERS) {
+
+            if(customer.getCustomerId()==customerId){
+
+                if(customer.getDaysToPay()==1){
+
+                    removeFromDefaulters(customerId);
+
+                    break;
+
+                }else{
+
+                    customer.setDaysToPay(customer.getDaysToPay()-1);
+
+                    break;
+
+                }
+            }
+
+        }
+
+    }
+
+    public static void removeFromDefaulters(int customerId){
+
+        for (int i = 0; i<DBHelper.CUSTOMERS_DEFAULTERS.size(); i++) {
+            Customer customer = DBHelper.CUSTOMERS_DEFAULTERS.get(i);
+            if(customer.getCustomerId()==customerId){
+                DBHelper.CUSTOMERS_DEFAULTERS.remove(i);
+            }
+        }
+
+    }
+
+    public static boolean verifyPartner(String username, String password){
+
+        for (Partner partner:
+                DBHelper.PARTNERS) {
+            if(partner.getUsername().equals(username) && partner.getPassword().equals(password)){
+                return true;
+            }
+        }
+        return false;
+
+    }
+
 
 }

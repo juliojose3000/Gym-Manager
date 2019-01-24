@@ -25,6 +25,8 @@ public class Customer {
         this.starDate = starDate;
     }
 
+
+
     public Customer() {
     }
 

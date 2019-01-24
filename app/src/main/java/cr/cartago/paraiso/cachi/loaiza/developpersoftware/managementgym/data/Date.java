@@ -29,6 +29,8 @@ public class Date {
 
     public static String getDateForShowUser(String date){
 
+        String dayName = getDayName(date);
+
         String[] dateParts = date.split("-");
 
         String day = dateParts[2];
@@ -37,7 +39,55 @@ public class Date {
 
         String year = dateParts[0];
 
-        return day+" "+month+" "+year;
+        return dayName+", "+day+" "+month+" "+year;
+
+    }
+
+    public static String getDateOfFirstDayInTheWeek(){
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+
+        int year = calendar.get(Calendar.YEAR);
+
+        int month = calendar.get(Calendar.MONTH)+1;
+
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String date = year+"-"+month+"-"+dayOfMonth;
+
+        String dayName = getDayName(date);
+
+        String monthName = getMonthByNum(month-1);
+
+        return dayName+", "+dayOfMonth+" "+monthName+" "+year;
+
+    }
+
+    public static String getDateOfLastDayInTheWeek(){
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+
+        calendar.add(Calendar.DAY_OF_YEAR, 7);
+
+        int year = calendar.get(Calendar.YEAR);
+
+        int month = calendar.get(Calendar.MONTH)+1;
+
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String date = year+"-"+month+"-"+dayOfMonth;
+
+        String dayName = getDayName(date);
+
+        String monthName = getMonthByNum(month-1);
+
+        return dayName+", "+dayOfMonth+" "+monthName+" "+year;
 
     }
 
@@ -107,6 +157,52 @@ public class Date {
         }
 
         return "";
+    }
+
+    public static String getDateOfTheLastDayInTheCurrentMonth(){
+
+        Calendar calendar = Calendar.getInstance();
+
+        //calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+
+        int year = calendar.get(Calendar.YEAR);
+
+        int month = calendar.get(Calendar.MONTH)+1;
+
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String date = year+"-"+month+"-"+dayOfMonth;
+
+        String dayName = getDayName(date);
+
+        String monthName = getMonthByNum(month-1);
+
+        return dayName+", "+dayOfMonth+" "+monthName+" "+year;
+
+    }
+
+    public static String getDateOfTheFirstDayInTheCurrentMonth(){
+
+        Calendar calendar = Calendar.getInstance();
+
+        //calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+
+        int year = calendar.get(Calendar.YEAR);
+
+        int month = calendar.get(Calendar.MONTH)+1;
+
+        int dayOfMonth = 1;
+
+        String date = year+"-"+month+"-"+dayOfMonth;
+
+        String dayName = getDayName(date);
+
+        String monthName = getMonthByNum(month-1);
+
+        return dayName+", "+dayOfMonth+" "+monthName+" "+year;
+
     }
 
 

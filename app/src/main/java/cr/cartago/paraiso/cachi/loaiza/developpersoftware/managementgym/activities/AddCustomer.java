@@ -12,6 +12,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Calendar;
@@ -39,6 +41,8 @@ public class AddCustomer extends Activity {
     private Calendar calendar;
 
     private ThreadConnectionDB threadConnectionDB;
+
+    private int codeResponse = 200;
 
 
     String name;
@@ -129,6 +133,16 @@ public class AddCustomer extends Activity {
 
         threadConnectionDB.start();
 
+        if(codeResponse==200){
+            Customer customer = new Customer(DBHelper.CUSTOMERS.get(DBHelper.CUSTOMERS.size()-1).getCustomerId()+1,name, lastname, nickname, startdate);
+            DBHelper.CUSTOMERS.add(customer);
+            DBHelper.CUSTOMERS_FOR_ADD_TODAY.add(customer);
+            cancel(null);
+            Toast.makeText(this,"Se ha registrado el cliente exitosamente",Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(this,"Hubo un problema al guardar el cliente. Intente de nuevo",Toast.LENGTH_LONG).show();
+        }
+
 
 
     }
@@ -151,7 +165,7 @@ public class AddCustomer extends Activity {
     public class ThreadConnectionDB extends Thread{
         public void run()
         {
-            DBHelper.insertCustomer(name, lastname, startdate,nickname);
+            codeResponse = DBHelper.insertCustomer(name, lastname, startdate,nickname);
         }
     }
 

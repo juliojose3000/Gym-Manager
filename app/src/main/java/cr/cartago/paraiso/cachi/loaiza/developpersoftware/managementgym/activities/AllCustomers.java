@@ -13,8 +13,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
@@ -39,8 +42,9 @@ public class AllCustomers extends Activity {
 
         listViewCustomers = findViewById(R.id.listview_all_customers);
 
-        fillLisViewCustomers();
+        listCustomers = DBHelper.CUSTOMERS;
 
+        fillLisViewCustomers();
 
         listViewCustomers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -62,7 +66,7 @@ public class AllCustomers extends Activity {
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_checked,
-                getNameAndLastNameFromListCustomer() );
+                getNameAndLastNameFromListCustomer());
 
         listViewCustomers.setAdapter(arrayAdapter);
         listViewCustomers.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -74,11 +78,19 @@ public class AllCustomers extends Activity {
 
         ArrayList<String> listNamesAndLastNames = new ArrayList<>();
 
-        for (Customer customer: DBHelper.CUSTOMERS) {
+        for (Customer customer: listCustomers) {
 
             listNamesAndLastNames.add(customer.getName()+" "+customer.getLastName());
 
         }
+
+        //alphabetical order
+        Collections.sort(listNamesAndLastNames, new Comparator<String>() {
+            @Override
+            public int compare(String s1, String s2) {
+                return s1.compareToIgnoreCase(s2);
+            }
+        });
 
         return listNamesAndLastNames;
 
@@ -99,17 +111,24 @@ public class AllCustomers extends Activity {
 
     }
 
-
-    public void customerToSearch2(View v){
-
-    }
-
     private void hideKeyboard(){
         View view = this.getCurrentFocus();
         if(view !=null){
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+
+    }
+
+    public void customerToSearch2(View v){
+
+        String nameCustomerToSearch = editText_customerToSearch.getText().toString();
+
+        listCustomers = CustomerData.customerToSearch(nameCustomerToSearch, DBHelper.CUSTOMERS);
+
+        fillLisViewCustomers();
+
+        hideKeyboard();
 
     }
 

@@ -87,7 +87,7 @@ public class HttpJsonParser {
     }
 
     //Method: POST, UPDATE, DELETE
-    public void sendJson(String urlAdress, Map<String, String> params) throws IOException, JSONException {
+    public int sendJson(String urlAdress, Map<String, String> params) throws IOException, JSONException {
 
         URL url = new URL(urlAdress);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -115,6 +115,8 @@ public class HttpJsonParser {
         Log.i("MSG" , conn.getResponseMessage());
 
         conn.disconnect();
+
+        return conn.getResponseCode();
 
     }
 

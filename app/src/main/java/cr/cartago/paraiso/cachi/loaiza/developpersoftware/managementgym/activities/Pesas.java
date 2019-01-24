@@ -58,6 +58,13 @@ public class Pesas extends Activity {
 
                 row.setBackgroundColor (Color.TRANSPARENT); // default coloe
 
+                for (Customer customer:
+                        DBHelper.CUSTOMERS_DEFAULTERS) {
+                    if(getItem(position).equals(customer.getName()+" "+customer.getLastName()))
+                    {
+                        row.setBackgroundColor (Color.argb(100,255,0,0)); // some color
+                    }
+                }
                 return row;
             }
         });
@@ -179,14 +186,5 @@ public class Pesas extends Activity {
             return false;
 
     }
-
-
-
-
-
-
-
-
-
 
 }

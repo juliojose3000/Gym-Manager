@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
 public class Morosos extends Activity {
@@ -35,6 +36,8 @@ public class Morosos extends Activity {
 
         listView_defaulterCustomers = findViewById(R.id.listview_defaulterCustomers);
 
+        customers = DBHelper.CUSTOMERS_DEFAULTERS;
+
         listView_defaulterCustomers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -45,10 +48,20 @@ public class Morosos extends Activity {
 
         });
 
-
+        fillLisViewCustomers();
     }
 
+    public void fillLisViewCustomers() {
 
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_checked,
+                CustomerData.getAllDefaulters());
+
+        listView_defaulterCustomers.setAdapter(arrayAdapter);
+        listView_defaulterCustomers.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+    }
 
 
     public void detailsBillToPay(View v){
@@ -90,6 +103,8 @@ public class Morosos extends Activity {
             return false;
 
     }
+
+
 
 
 

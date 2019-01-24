@@ -1,11 +1,5 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,9 +12,8 @@ import java.util.Map;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.CustomerPay;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.CustomerToday;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.DefaulterCustomer;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Partner;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Payment;
 
 /**
  * Created by Jay on 06-06-2017.
@@ -28,27 +21,25 @@ import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.D
 
 public class DBHelper  {
 
-    public static String REST_API_PHP_URL = "http://192.168.1.6/proyectos_web/AppGym/CachiFitnessCenter%20REST%20API%20PHP/php_rest_cachi_fitness_center/api/";
+    //public static String REST_API_PHP_URL = "http://192.168.1.6/proyectos_web/AppGym/CachiFitnessCenter%20REST%20API%20PHP/php_rest_cachi_fitness_center/api/";
+    public static String REST_API_PHP_URL = "https://loaiza.000webhostapp.com/php_rest_cachi_fitness_center/api/";
 
     public static ArrayList<Customer> CUSTOMERS;
     public static ArrayList<Customer> CUSTOMERS_TODAY;
     public static ArrayList<Customer> CUSTOMERS_FOR_ADD_TODAY;
     public static ArrayList<Customer> CUSTOMERS_WITH_CURRENT_PAYMENT;
     public static ArrayList<Customer> CUSTOMERS_DEFAULTERS;
+    public static ArrayList<Payment>  CUSTOMER_PAYMENTS;
+    public static ArrayList<Partner> PARTNERS;
 
     private Date date;
 
 
     public DBHelper(){
-        CUSTOMERS = new ArrayList<>();
-        CUSTOMERS_TODAY = new ArrayList<>();
-        CUSTOMERS_FOR_ADD_TODAY = new ArrayList<>();
-        CUSTOMERS_WITH_CURRENT_PAYMENT = new ArrayList<>();
-        CUSTOMERS_DEFAULTERS = new ArrayList<>();
-
         date = new Date();
 
         try {
+            getAllPartners();
             getAllCustomers();
             getAllCustomersToday(date.getDateOfToday());
             getAllCustomersWithCurrentPayment(date.getDateOfToday());
@@ -59,7 +50,35 @@ public class DBHelper  {
         }
     }
 
-    public void getAllCustomers() throws JSONException {
+    public static void getAllPartners() throws JSONException {
+
+        PARTNERS = new ArrayList<>();
+
+        Map<String, String> params = new HashMap<>();
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+        JSONArray jsonArray =  httpJsonParser.getJson(REST_API_PHP_URL+"partner/read.php", params);
+
+        for(int i=0; i<jsonArray.length(); i++)
+        {
+            JSONObject jsonObject=jsonArray.getJSONObject(i);
+            int id = jsonObject.getInt("partner_id");
+            String name = jsonObject.getString("partner_name");
+            String lastname = jsonObject.getString("partner_lastname");
+            String username = jsonObject.getString("partner_username");
+            String password = jsonObject.getString("partner_password");
+
+            Partner partner = new Partner(id, name, lastname, username, password);
+
+            PARTNERS.add(partner);
+
+        }
+    }
+
+    public static void getAllCustomers() throws JSONException {
+
+        CUSTOMERS = new ArrayList<>();
 
         JSONObject jsonObject;
 
@@ -71,6 +90,10 @@ public class DBHelper  {
 
         JSONArray jsonArray =  httpJsonParser.getJson(DBCustomer.URL_Read(), params);
 
+        if(jsonArray==null){
+            return;
+        }
+
         for(int i=0; i<jsonArray.length(); i++)
         {
             jsonObject=jsonArray.getJSONObject(i);
@@ -80,7 +103,7 @@ public class DBHelper  {
             String startDate = jsonObject.getString("start_date");
             String customerNickname = jsonObject.getString("customer_nickname");
 
-            customer = new Customer(customerId, customerName, customerLastname, startDate, customerNickname);
+            customer = new Customer(customerId, customerName, customerLastname, customerNickname, startDate);
 
             CUSTOMERS.add(customer);
 
@@ -88,6 +111,8 @@ public class DBHelper  {
     }
 
     public void getAllCustomersToday(String date) throws JSONException {
+
+        CUSTOMERS_TODAY = new ArrayList<>();
 
         Map<String, String> params = new HashMap<>();
 
@@ -110,32 +135,39 @@ public class DBHelper  {
 
     public void getAllCustomersWithCurrentPayment(String date) throws JSONException {
 
+        CUSTOMER_PAYMENTS = new ArrayList<>();
+
+        CUSTOMERS_WITH_CURRENT_PAYMENT = new ArrayList<>();
+
         Map<String, String> params = new HashMap<>();
 
-        params.put("date_arrived",date);
+        params.put("pay_end",date);
 
         HttpJsonParser httpJsonParser = new HttpJsonParser();
 
-        JSONArray jsonArray =  httpJsonParser.getJson(DBCustomerPay.URL_Read(), params);
+        JSONArray jsonArray =  httpJsonParser.getJson(DBCustomerPay.URL_Customers_With_Current_Payment(), params);
 
         for(int i=0; i<jsonArray.length(); i++)
         {
             JSONObject jsonObject=jsonArray.getJSONObject(i);
+            int customerPayId = jsonObject.getInt("customer_pay_id");
             int customerId = jsonObject.getInt("customer_id");
-            String customerName = jsonObject.getString("customer_name");
-            String customerLastname = jsonObject.getString("customer_lastname");
-            String startDate = jsonObject.getString("start_date");
-            String customerNickname = jsonObject.getString("customer_nickname");
+            String startPay = jsonObject.getString("pay_date");
+            String endPay = jsonObject.getString("pay_end");
+            String amountTime = jsonObject.getString("amount_time");
 
-            Customer customer = new Customer(customerId, customerName, customerLastname, startDate, customerNickname);
+            CUSTOMER_PAYMENTS.add(new Payment(customerPayId, customerId, startPay, endPay, amountTime));
 
-            CUSTOMERS_WITH_CURRENT_PAYMENT.add(customer);
+
+            CUSTOMERS_WITH_CURRENT_PAYMENT.add(CustomerData.getCustomerById(customerId));
 
         }
 
     }
 
-    public static void insertCustomer(String name, String lastname, String dateStart, String nickname){
+    public static int insertCustomer(String name, String lastname, String dateStart, String nickname){
+
+        int code = 0;
 
         Map<String, String> params = new HashMap<>();
 
@@ -146,15 +178,14 @@ public class DBHelper  {
 
         HttpJsonParser httpJsonParser = new HttpJsonParser();
 
-        //httpJsonParser.makeHttpRequest(DBCustomer.URL_Create(), "POST", params);
         try {
-            httpJsonParser.sendJson(DBCustomer.URL_Create(), params);
+            code = httpJsonParser.sendJson(DBCustomer.URL_Create(), params);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        return code;
     }
 
     public static void insertCustomersOfToday(int customerId,String today){
@@ -176,13 +207,15 @@ public class DBHelper  {
 
     }
 
-    public void getAllCustomersDefaulters() throws JSONException {
+    public static void getAllCustomersDefaulters() throws JSONException {
+
+        CUSTOMERS_DEFAULTERS = new ArrayList<>();
 
         Map<String, String> params = new HashMap<>();
 
         HttpJsonParser httpJsonParser = new HttpJsonParser();
 
-        JSONArray jsonArray =  httpJsonParser.getJson(DBDefaulterCustomer.URL_Read(), params);
+        JSONArray jsonArray =  httpJsonParser.getJson(DBDefaulterCustomer.URL_All_Defaulters(), params);
 
         for(int i=0; i<jsonArray.length(); i++)
         {
@@ -190,7 +223,11 @@ public class DBHelper  {
 
             int customerId = jsonObject.getInt("customer_id");
 
-            CUSTOMERS_DEFAULTERS.add(CustomerData.getCustomerById(customerId));
+            Customer customer = CustomerData.getCustomerById(customerId);
+
+            customer.setDaysToPay(jsonObject.getInt("days_to_pay"));
+
+            CUSTOMERS_DEFAULTERS.add(customer);
 
         }
     }
@@ -216,12 +253,142 @@ public class DBHelper  {
 
     public static void getCustomerForAddToday(){
 
+        CUSTOMERS_FOR_ADD_TODAY = new ArrayList<>();
+
         for (Customer customer:
                 DBHelper.CUSTOMERS) {
             if(!CustomerData.existsCustomerInCustomerOfToday(customer)){
                 CUSTOMERS_FOR_ADD_TODAY.add(customer);
             }
         }
+
+    }
+
+    public static void addPaymentFromCustomer(int customerId,String startDate,String endDate,String duracion){
+
+        final Map<String, String> params = new HashMap<>();
+
+        params.put("customer_id",""+customerId);
+        params.put("pay_date",startDate);
+        params.put("pay_end",endDate);
+        params.put("amount_time",duracion);
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+        try {
+            httpJsonParser.sendJson(DBCustomerPay.URL_Create(), params);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public static void deleteDaysForPayByCoveredPay(int customerId,String startDate){
+
+        final Map<String, String> params = new HashMap<>();
+
+        params.put("customer_id",""+customerId);
+        params.put("arrived_date",startDate);
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+        try {
+            httpJsonParser.sendJson(DBDefaulterCustomer.URL_Delete_Days_Covered_By_Payment(), params);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public static ArrayList<String> getListAllBillToPay(int customerId) throws JSONException {
+
+        ArrayList<String> listBillToPayOfCustomer = new ArrayList<>();
+
+        Map<String, String> params = new HashMap<>();
+
+        params.put("customer_id",""+customerId);
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+        JSONArray jsonArray =  httpJsonParser.getJson(DBDefaulterCustomer.URL_Bill_To_Pay(), params);
+
+        for(int i=0; i<jsonArray.length(); i++)
+        {
+            JSONObject jsonObject=jsonArray.getJSONObject(i);
+            String arrivedDate = jsonObject.getString("arrived_date");
+
+            listBillToPayOfCustomer.add(Date.getDateForShowUser(arrivedDate));
+
+        }
+
+        return listBillToPayOfCustomer;
+
+    }
+
+    public static void cancelBillToPay(int customerId, String date){
+
+        Map<String, String> params = new HashMap<>();
+
+        params.put("customer_id",""+customerId);
+        params.put("arrived_date",date);
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+        try {
+            httpJsonParser.sendJson(DBDefaulterCustomer.URL_Cancel_Bill_To_Pay(), params);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void cancelAllBillToPay(int customerId){
+
+        Map<String, String> params = new HashMap<>();
+
+        params.put("customer_id",""+customerId);
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+        try {
+            httpJsonParser.sendJson(DBDefaulterCustomer.URL_All_Cancel_Bill_To_Pay(), params);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static ArrayList<Customer> customerInSpecificDate(String date) throws JSONException {
+
+        ArrayList<Customer> listCustomer = new ArrayList<>();
+
+        Map<String, String> params = new HashMap<>();
+
+        params.put("date_arrived",date);
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+        JSONArray jsonArray =  httpJsonParser.getJson(DBCustomerToday.URL_In_Specific_Date(), params);
+
+        for(int i=0; i<jsonArray.length(); i++)
+        {
+            JSONObject jsonObject=jsonArray.getJSONObject(i);
+
+            int customerId = jsonObject.getInt("customer_id");
+
+            listCustomer.add(CustomerData.getCustomerById(customerId));
+
+        }
+
+        return listCustomer;
 
     }
 

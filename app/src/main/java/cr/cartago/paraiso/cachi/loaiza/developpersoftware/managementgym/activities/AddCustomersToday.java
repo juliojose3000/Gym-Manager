@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -14,17 +15,16 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.concurrent.ExecutionException;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.CustomerToday;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.DefaulterCustomer;
 
 public class AddCustomersToday extends Activity {
 
@@ -37,8 +37,6 @@ public class AddCustomersToday extends Activity {
     private EditText editText_customerToSearch;
 
     private ArrayList<Integer> customersId;
-
-    private ThreadConnectionDB threadConnectionDB;
 
     private Date date;
 
@@ -78,10 +76,6 @@ public class AddCustomersToday extends Activity {
 
         });
 
-        threadConnectionDB = new ThreadConnectionDB();
-
-        threadConnectionDB.start();
-
     }
 
     public void fillLisViewCustomers() {
@@ -107,6 +101,14 @@ public class AddCustomersToday extends Activity {
             listNamesAndLastNames.add(customer.getName()+" "+customer.getLastName());
 
         }
+
+        //alphabetical order
+        Collections.sort(listNamesAndLastNames, new Comparator<String>() {
+            @Override
+            public int compare(String s1, String s2) {
+                return s1.compareToIgnoreCase(s2);
+            }
+        });
 
         return listNamesAndLastNames;
 
@@ -164,12 +166,11 @@ public class AddCustomersToday extends Activity {
                 customerId = listCustomersForAddToday.get(i).getCustomerId();
                 customersId.add(customerId);
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
+                new Thread(){
+                    public void run(){
                         DBHelper.insertCustomersOfToday(customerId, date.getDateOfToday());
                     }
-                }).start();
+                }.start();
 
                 if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){// the customer doesn't have a current payment
 
@@ -182,14 +183,11 @@ public class AddCustomersToday extends Activity {
                         CustomerData.incrementDaysForPay(customerId);
                     }
 
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
+                    new Thread(){
+                        public void run(){
                             DBHelper.insertCustomerDefaulter(customerId, date.getDateOfToday());//si el cliente ha llegado y no tiene un pago vigente que lo cubra, se agrega a morosos
                         }
-                    }).start();
-
-
+                    }.start();
                 }
             }
         }
@@ -234,7 +232,19 @@ public class AddCustomersToday extends Activity {
 
     public void customerToSearch(View v){
 
+        String nameCustomerToSearch = editText_customerToSearch.getText().toString();
 
+        listCustomersForAddToday = CustomerData.customerToSearch(nameCustomerToSearch, DBHelper.CUSTOMERS_FOR_ADD_TODAY);
+
+        if(listCustomersForAddToday.size()==0){
+            Toast.makeText(this,"No se encontraron resultados similares",Toast.LENGTH_LONG).show();
+        }
+
+        itemsChecked = new boolean[listCustomersForAddToday.size()];
+
+        fillLisViewCustomers();
+
+        hideKeyboard();
 
     }
 
@@ -250,7 +260,16 @@ public class AddCustomersToday extends Activity {
     public class ThreadConnectionDB extends Thread{
         public void run()
         {
+            DBHelper.insertCustomersOfToday(customerId, date.getDateOfToday());
+        }
+    }
 
+    private class Test extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+            DBHelper.insertCustomersOfToday(customerId, date.getDateOfToday());
+            return null;
         }
     }
 

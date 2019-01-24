@@ -15,4 +15,11 @@ public class DBCustomerPay {
         return SERVER_URL+"read.php";
     }
 
+    public static String URL_Create(){
+        return SERVER_URL+"create.php";
+    }
+
+    public static String URL_Customers_With_Current_Payment(){
+        return SERVER_URL+"with_current_payment.php";
+    }
 }

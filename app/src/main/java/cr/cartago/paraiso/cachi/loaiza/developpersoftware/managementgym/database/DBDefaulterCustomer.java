@@ -19,4 +19,28 @@ public class DBDefaulterCustomer {
         return SERVER_URL+"create.php";
     }
 
+    public static String URL_Bill_To_Pay(){
+        return SERVER_URL+"bill_to_pay.php";
+    }
+
+    public static String URL_All_Defaulters(){
+        return SERVER_URL+"all_defaulters.php";
+    }
+
+    public static String URL_Cancel_Bill_To_Pay(){
+        return SERVER_URL+"cancel_bill_to_pay.php";
+    }
+
+    public static String URL_All_Cancel_Bill_To_Pay(){
+        return SERVER_URL+"cancel_all_bill_to_pay.php";
+    }
+
+    public static String URL_Delete_Days_Covered_By_Payment(){
+        return SERVER_URL+"delete.php";
+    }
+
+
+
+
+
 }
