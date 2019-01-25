@@ -16,15 +16,15 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 
-import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.concurrent.ExecutionException;
+import java.sql.Date;
+import java.util.ArrayList;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Dates;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Payment;
+
 
 public class AddPayment extends Activity {
 
@@ -42,11 +42,13 @@ public class AddPayment extends Activity {
 
     private Button dayButton, weekButton, monthButton;
 
-    private Date date;
+    private Dates date;
 
     private String startDate;
 
     private String endDate;
+
+    private ArrayList<String> listBillToPay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,13 +69,29 @@ public class AddPayment extends Activity {
 
         customerId = extras.getInt("customer_id");
 
-        date = new Date();
+        date = new Dates();
 
         textView_customerName = findViewById(R.id.textView_payment_customer);
 
         textView_paymentDetails = findViewById(R.id.textView_payment_details);
 
         textView_customerName.setText("Agregar un pago a "+customerName);
+
+        listBillToPay = new ArrayList<>();
+
+        new AsyncTask<Void, Void, Void>(){
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                try {
+                    listBillToPay = DBHelper.getListAllBillToPay(customerId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+        }.execute();
 
     }
 
@@ -100,7 +118,7 @@ public class AddPayment extends Activity {
 
         endDate = startDate;
 
-        paymentDetails = "Cliente: "+customerName+"\nCubre hoy: "+Date.getDateForShowUser(startDate)+"\nDuración: "+duracion;
+        paymentDetails = "Cliente: "+customerName+"\nCubre hoy: "+Dates.getDateForShowUser(startDate)+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
@@ -183,18 +201,24 @@ public class AddPayment extends Activity {
 
             if(CustomerData.theCustomerIsDefaulter(customerId)){//If the customer is defaulter, so delete the days covered by the payment
 
-                new Thread(){
-                    public void run(){
+                isHeNoLongerADefaulter();
+
+                new AsyncTask<Void, Void, Void>(){
+
+                    @Override
+                    protected Void doInBackground(Void... voids) {
                         DBHelper.deleteDaysForPayByCoveredPay(customerId, startDate);
                         try {
                             DBHelper.getAllCustomersDefaulters();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        return null;
                     }
-                }.start();
+                }.execute();
 
             }
+
             disabilityButtons();
             Toast.makeText(this, "Se agregó el pago correctamente", Toast.LENGTH_LONG).show();
 
@@ -205,6 +229,26 @@ public class AddPayment extends Activity {
 
     }
 
+    public void isHeNoLongerADefaulter(){
+
+        if(listBillToPay.size()==0){
+            return;
+        }
+
+        Date oldBillToPay = Date.valueOf(Dates.getDateForDB(listBillToPay.get(0)));
+        Date firstDayDateToPay = Date.valueOf(startDate);
+
+        if (oldBillToPay.compareTo(firstDayDateToPay) > 0) {
+            CustomerData.removeFromDefaulters(customerId);
+        } else if (oldBillToPay.compareTo(firstDayDateToPay) < 0) {
+            System.out.println("Date1 is before Date2");
+        } else if (oldBillToPay.compareTo(firstDayDateToPay) == 0) {
+            CustomerData.removeFromDefaulters(customerId);
+        } else {
+            System.out.println("How to get here?");
+        }
+
+    }
 
     @Override
     public void onBackPressed(){

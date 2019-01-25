@@ -85,12 +85,12 @@ public class AllCustomers extends Activity {
         }
 
         //alphabetical order
-        Collections.sort(listNamesAndLastNames, new Comparator<String>() {
+        /*Collections.sort(listNamesAndLastNames, new Comparator<String>() {
             @Override
             public int compare(String s1, String s2) {
                 return s1.compareToIgnoreCase(s2);
             }
-        });
+        });*/
 
         return listNamesAndLastNames;
 

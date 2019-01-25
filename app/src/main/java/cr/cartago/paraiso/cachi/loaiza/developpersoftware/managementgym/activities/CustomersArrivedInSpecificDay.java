@@ -22,7 +22,7 @@ import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Dates;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
@@ -110,7 +110,7 @@ public class CustomersArrivedInSpecificDay extends Activity {
             return;
         }
 
-        String date = Date.getDateForShowUser(year + "-" + (month+1) + "-" + dayOfMonth);
+        String date = Dates.getDateForShowUser(year + "-" + (month+1) + "-" + dayOfMonth);
 
         dateArrivedCustomers.setText(date);
 

@@ -6,11 +6,13 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Dates;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Partner;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Payment;
@@ -30,13 +32,13 @@ public class DBHelper  {
     public static ArrayList<Customer> CUSTOMERS_WITH_CURRENT_PAYMENT;
     public static ArrayList<Customer> CUSTOMERS_DEFAULTERS;
     public static ArrayList<Payment>  CUSTOMER_PAYMENTS;
-    public static ArrayList<Partner> PARTNERS;
+    public static ArrayList<Partner>  PARTNERS;
 
-    private Date date;
+    private Dates date;
 
 
     public DBHelper(){
-        date = new Date();
+        date = new Dates();
 
         try {
             getAllPartners();
@@ -321,7 +323,7 @@ public class DBHelper  {
             JSONObject jsonObject=jsonArray.getJSONObject(i);
             String arrivedDate = jsonObject.getString("arrived_date");
 
-            listBillToPayOfCustomer.add(Date.getDateForShowUser(arrivedDate));
+            listBillToPayOfCustomer.add(Dates.getDateForShowUser(arrivedDate));
 
         }
 

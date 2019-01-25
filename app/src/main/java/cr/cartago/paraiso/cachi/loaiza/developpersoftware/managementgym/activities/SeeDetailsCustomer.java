@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Dates;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Payment;
 
@@ -24,7 +24,7 @@ public class SeeDetailsCustomer extends Activity {
 
     private Payment payment;
 
-    private Date date;
+    private Dates date;
 
 
     @Override
@@ -40,7 +40,7 @@ public class SeeDetailsCustomer extends Activity {
 
         isDefaulter = CustomerData.theCustomerIsDefaulter(customerId);
 
-        date = new Date();
+        date = new Dates();
 
         String customerStatus;
 
@@ -57,11 +57,11 @@ public class SeeDetailsCustomer extends Activity {
 
             if(payment.getAmuntTime().equals("un dia")){
                 customerStatus+="\n\nTiene un pago vigente de "+payment.getAmuntTime()+" que cubre el "+
-                        Date.getDateForShowUser(payment.getPayDateStart());
+                        Dates.getDateForShowUser(payment.getPayDateStart());
             }else{
                 customerStatus+="\n\nTiene un pago vigente de "+payment.getAmuntTime()+" que cubre\ndel "+
-                        Date.getDateForShowUser(payment.getPayDateStart())+"\nal "+
-                        Date.getDateForShowUser(payment.getPayDateEnd());
+                        Dates.getDateForShowUser(payment.getPayDateStart())+"\nal "+
+                        Dates.getDateForShowUser(payment.getPayDateEnd());
             }
 
         }
@@ -72,7 +72,7 @@ public class SeeDetailsCustomer extends Activity {
         if(!customer.getNickname().equals("")){
             customerDetails+="\n\nConocido(a) como: "+customer.getNickname();
         }
-        customerDetails+="\n\nInició el: "+ Date.getDateForShowUser(customer.getStarDate())
+        customerDetails+="\n\nInició el: "+ Dates.getDateForShowUser(customer.getStarDate())
                 +"\n\n"+customerStatus;
 
         textView_customerDetails = findViewById(R.id.textView_customer_details);

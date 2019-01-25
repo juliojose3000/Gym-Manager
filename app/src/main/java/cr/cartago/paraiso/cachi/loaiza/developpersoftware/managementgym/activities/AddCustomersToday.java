@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutionException;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Dates;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
@@ -38,7 +38,7 @@ public class AddCustomersToday extends Activity {
 
     private ArrayList<Integer> customersId;
 
-    private Date date;
+    private Dates date;
 
     private int customerId;
 
@@ -53,7 +53,7 @@ public class AddCustomersToday extends Activity {
 
         listViewCustomers = findViewById(R.id.listview_customers);
 
-        date = new Date();
+        date = new Dates();
 
         listCustomersForAddToday = DBHelper.CUSTOMERS_FOR_ADD_TODAY;
 
@@ -70,7 +70,6 @@ public class AddCustomersToday extends Activity {
                 }else{
                     itemsChecked[position] = false;
                 }
-
 
             }
 
@@ -101,14 +100,6 @@ public class AddCustomersToday extends Activity {
             listNamesAndLastNames.add(customer.getName()+" "+customer.getLastName());
 
         }
-
-        //alphabetical order
-        Collections.sort(listNamesAndLastNames, new Comparator<String>() {
-            @Override
-            public int compare(String s1, String s2) {
-                return s1.compareToIgnoreCase(s2);
-            }
-        });
 
         return listNamesAndLastNames;
 
@@ -166,11 +157,20 @@ public class AddCustomersToday extends Activity {
                 customerId = listCustomersForAddToday.get(i).getCustomerId();
                 customersId.add(customerId);
 
-                new Thread(){
+                /*NOTE: WHEN INSERT THE CUSTOMERS THAT ARRIVED TODAY IN THE GYM WITH A THREAD,
+                * ONLY INSERT ONE CUSTOMER THE AMOUNT TIMES THAT ADD CUSTOMERS, BUT AN ASYNC TASK
+                * CAN THE WORK CORRECTLY*/
+
+                /*new Thread(){
                     public void run(){
                         DBHelper.insertCustomersOfToday(customerId, date.getDateOfToday());
                     }
-                }.start();
+                }.start();*/
+
+
+                Test test = new Test();
+                test.execute(""+customerId, date.getDateOfToday());
+
 
                 if(!CustomerData.theCustomerHaveCurrentPayment(customerId)){// the customer doesn't have a current payment
 
@@ -183,11 +183,21 @@ public class AddCustomersToday extends Activity {
                         CustomerData.incrementDaysForPay(customerId);
                     }
 
-                    new Thread(){
+                    /*new Thread(){
                         public void run(){
                             DBHelper.insertCustomerDefaulter(customerId, date.getDateOfToday());//si el cliente ha llegado y no tiene un pago vigente que lo cubra, se agrega a morosos
                         }
-                    }.start();
+                    }.start();*/
+
+                    new AsyncTask<String, Void, Void>(){
+
+                        @Override
+                        protected Void doInBackground(String... strings) {
+                            DBHelper.insertCustomerDefaulter(Integer.parseInt(strings[0]), strings[1]);//si el cliente ha llegado y no tiene un pago vigente que lo cubra, se agrega a morosos
+                            return null;
+                        }
+                    }.execute(""+customerId, date.getDateOfToday());
+
                 }
             }
         }
@@ -268,7 +278,7 @@ public class AddCustomersToday extends Activity {
 
         @Override
         protected Void doInBackground(String... params) {
-            DBHelper.insertCustomersOfToday(customerId, date.getDateOfToday());
+            DBHelper.insertCustomersOfToday(Integer.parseInt(params[0]), params[1]);
             return null;
         }
     }

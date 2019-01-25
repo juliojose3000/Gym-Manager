@@ -5,13 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class Date {
+public class Dates {
 
     private int year, month, dayOfMonth;
 
     private Calendar calendar;
 
-    public Date(){
+    public Dates(){
 
         calendar = Calendar.getInstance();
 

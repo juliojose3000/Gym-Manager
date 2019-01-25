@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Date;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Dates;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 
 public class CustomerBillToPay extends Activity {
@@ -114,7 +114,7 @@ public class CustomerBillToPay extends Activity {
 
         new Thread(){
             public void run(){
-                DBHelper.cancelBillToPay(customerId, Date.getDateForDB(dateBillToPay));
+                DBHelper.cancelBillToPay(customerId, Dates.getDateForDB(dateBillToPay));
             }
         }.start();
 

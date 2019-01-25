@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -31,6 +32,10 @@ public class Pesas extends Activity {
 
     private Customer customerCurrentSelected;
 
+    private ArrayList<Customer> customersDefaulters;
+
+    private ArrayAdapter<String> arrayAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -50,8 +55,18 @@ public class Pesas extends Activity {
 
         });
 
+        customersDefaulters = DBHelper.CUSTOMERS_DEFAULTERS;
 
-        listViewCustomers.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_checked, CustomerData.getNameAndLastNameFromListCustomer(DBHelper.CUSTOMERS_TODAY)) {
+        createAdapter();
+
+        listViewCustomers.setAdapter(arrayAdapter);
+
+        listViewCustomers.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+    }
+
+    public void createAdapter(){
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_checked, CustomerData.getNameAndLastNameFromListCustomer(DBHelper.CUSTOMERS_TODAY)) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View row = super.getView(position, convertView, parent);
@@ -59,7 +74,7 @@ public class Pesas extends Activity {
                 row.setBackgroundColor (Color.TRANSPARENT); // default coloe
 
                 for (Customer customer:
-                        DBHelper.CUSTOMERS_DEFAULTERS) {
+                        customersDefaulters) {
                     if(getItem(position).equals(customer.getName()+" "+customer.getLastName()))
                     {
                         row.setBackgroundColor (Color.argb(100,255,0,0)); // some color
@@ -67,10 +82,7 @@ public class Pesas extends Activity {
                 }
                 return row;
             }
-        });
-
-        listViewCustomers.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-
+        };
     }
 
     @Override
