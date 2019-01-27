@@ -91,6 +91,52 @@ public class Dates {
 
     }
 
+
+    public static String getDateInAWeek(){
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.add(Calendar.DAY_OF_YEAR, 7);//Lunes
+
+        int year = calendar.get(Calendar.YEAR);
+
+        int month = calendar.get(Calendar.MONTH)+1;
+
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String date = year+"-"+month+"-"+dayOfMonth;
+
+        String dayName = getDayName(date);
+
+        String monthName = getMonthByNum(month-1);
+
+        return dayName+", "+dayOfMonth+" "+monthName+" "+year;
+
+    }
+
+    public static String getDateInAMonth(){
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.add(Calendar.MONTH, 1);//Lunes
+
+        int year = calendar.get(Calendar.YEAR);
+
+        int month = calendar.get(Calendar.MONTH)+1;
+
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String date = year+"-"+month+"-"+dayOfMonth;
+
+        String dayName = getDayName(date);
+
+        String monthName = getMonthByNum(month-1);
+
+        return dayName+", "+dayOfMonth+" "+monthName+" "+year;
+
+    }
+
+
     public static String getMonthByNum(int i){
         String[] months = {"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dec"};
         return months[i];

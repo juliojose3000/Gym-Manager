@@ -83,25 +83,10 @@ public class AddCustomersToday extends Activity {
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_checked,
-                getNameAndLastNameFromListCustomer(listCustomersForAddToday));
+                CustomerData.getNameAndLastNameFromListCustomer(listCustomersForAddToday));
 
         listViewCustomers.setAdapter(arrayAdapter);
         listViewCustomers.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
-    }
-
-
-    private ArrayList<String> getNameAndLastNameFromListCustomer(ArrayList<Customer> listCustomersForAddToday){
-
-        ArrayList<String> listNamesAndLastNames = new ArrayList<>();
-
-        for (Customer customer:listCustomersForAddToday) {
-
-            listNamesAndLastNames.add(customer.getName()+" "+customer.getLastName());
-
-        }
-
-        return listNamesAndLastNames;
 
     }
 

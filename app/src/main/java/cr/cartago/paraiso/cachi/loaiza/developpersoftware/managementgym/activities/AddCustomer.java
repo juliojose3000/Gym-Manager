@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +17,7 @@ import org.json.JSONException;
 
 import java.sql.Date;
 import java.sql.SQLException;
+import java.text.Normalizer;
 import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
@@ -39,8 +41,6 @@ public class AddCustomer extends Activity {
     private int year, month, dayOfMonth;
 
     private Calendar calendar;
-
-    private ThreadConnectionDB threadConnectionDB;
 
     private int codeResponse = 200;
 
@@ -93,9 +93,6 @@ public class AddCustomer extends Activity {
             }
 
         });
-
-        threadConnectionDB = new ThreadConnectionDB();
-
     }
 
 
@@ -118,23 +115,32 @@ public class AddCustomer extends Activity {
             return;
         }
 
-        name = this.customerName.getText().toString();
+        name = stripAccents(this.customerName.getText().toString());
 
-        lastname = this.customerLastname.getText().toString();
+        lastname = stripAccents(this.customerLastname.getText().toString());
 
         startdate = this.customerStartdate.getText().toString();
 
-        nickname = this.customerNickname.getText().toString();
+        nickname = stripAccents(this.customerNickname.getText().toString());
 
-        if(customerName.equals("") || customerLastname.equals("") || customerStartdate.equals("")){
+        if(name.equals("") || lastname.equals("") || startdate.equals("")){
             Toast.makeText(this, "Solo el campo 'Conocido como' no es indispensable. Complete los demás.", Toast.LENGTH_LONG).show();
             return;
         }
 
-        threadConnectionDB.start();
+        new AsyncTask<String, Void, Void>(){
+
+            @Override
+            protected Void doInBackground(String... params) {
+                codeResponse = DBHelper.insertCustomer(params[0], params[1], params[2],params[3]);
+                return null;
+            }
+        }.execute(name, lastname, startdate, nickname);
 
         if(codeResponse==200){
-            Customer customer = new Customer(DBHelper.CUSTOMERS.get(DBHelper.CUSTOMERS.size()-1).getCustomerId()+1,name, lastname, nickname, startdate);
+
+            int customerId = DBHelper.CUSTOMERS.get(DBHelper.CUSTOMERS.size()-1).getCustomerId()+1;
+            Customer customer = new Customer(customerId,name, lastname, nickname, startdate);
             DBHelper.CUSTOMERS.add(customer);
             DBHelper.CUSTOMERS_FOR_ADD_TODAY.add(customer);
             cancel(null);
@@ -145,6 +151,13 @@ public class AddCustomer extends Activity {
 
 
 
+    }
+
+    public String stripAccents(String s)
+    {
+        s = Normalizer.normalize(s, Normalizer.Form.NFD);
+        s = s.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+        return s;
     }
 
     public boolean verifyInternetAccess(){
@@ -160,13 +173,6 @@ public class AddCustomer extends Activity {
         else
             return false;
 
-    }
-
-    public class ThreadConnectionDB extends Thread{
-        public void run()
-        {
-            codeResponse = DBHelper.insertCustomer(name, lastname, startdate,nickname);
-        }
     }
 
 

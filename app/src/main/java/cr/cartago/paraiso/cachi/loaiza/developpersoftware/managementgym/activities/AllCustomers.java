@@ -25,11 +25,11 @@ public class AllCustomers extends Activity {
 
     private ListView listViewCustomers;
 
-    private ArrayList<Customer> listCustomers;
-
     private Customer customerSelected;
 
     private EditText editText_customerToSearch;
+
+    private ArrayList<Customer> listCustomers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +50,7 @@ public class AllCustomers extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                customerSelected = listCustomers.get(position);
+                customerSelected = DBHelper.CUSTOMERS.get(position);
 
             }
 
@@ -66,35 +66,13 @@ public class AllCustomers extends Activity {
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_checked,
-                getNameAndLastNameFromListCustomer());
+                CustomerData.getNameAndLastNameFromListCustomer(listCustomers));
 
         listViewCustomers.setAdapter(arrayAdapter);
         listViewCustomers.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
     }
 
-
-    private ArrayList<String> getNameAndLastNameFromListCustomer(){
-
-        ArrayList<String> listNamesAndLastNames = new ArrayList<>();
-
-        for (Customer customer: listCustomers) {
-
-            listNamesAndLastNames.add(customer.getName()+" "+customer.getLastName());
-
-        }
-
-        //alphabetical order
-        /*Collections.sort(listNamesAndLastNames, new Comparator<String>() {
-            @Override
-            public int compare(String s1, String s2) {
-                return s1.compareToIgnoreCase(s2);
-            }
-        });*/
-
-        return listNamesAndLastNames;
-
-    }
 
     public void seeDetailsCustomer(View v){
 

@@ -36,7 +36,8 @@
         <activity android:name=".activities.SeeDetailsCustomer" />
         <activity android:name=".activities.Morosos" />
         <activity android:name=".activities.CustomerBillToPay" />
-        <activity android:name=".activities.CustomersArrivedInSpecificDay"></activity>
+        <activity android:name=".activities.CustomersArrivedInSpecificDay" />
+        <activity android:name=".activities.Notes"></activity>
     </application>
 
 </manifest>

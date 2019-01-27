@@ -14,6 +14,7 @@ import java.util.Map;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Dates;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Note;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Partner;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Payment;
 
@@ -33,6 +34,7 @@ public class DBHelper  {
     public static ArrayList<Customer> CUSTOMERS_DEFAULTERS;
     public static ArrayList<Payment>  CUSTOMER_PAYMENTS;
     public static ArrayList<Partner>  PARTNERS;
+    public static ArrayList<Note>     NOTES;
 
     private Dates date;
 
@@ -43,8 +45,8 @@ public class DBHelper  {
         try {
             getAllPartners();
             getAllCustomers();
-            getAllCustomersToday(date.getDateOfToday());
             getAllCustomersWithCurrentPayment(date.getDateOfToday());
+            getAllCustomersToday(date.getDateOfToday());
             getAllCustomersDefaulters();
             getCustomerForAddToday();
         } catch (JSONException e) {
@@ -391,6 +393,33 @@ public class DBHelper  {
         }
 
         return listCustomer;
+
+    }
+
+    public static void getAllNotes() throws JSONException {
+
+        NOTES = new ArrayList<>();
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+        JSONArray jsonArray =  httpJsonParser.getJson(DBNotes.URL_Read(), new HashMap<String, String>());
+
+        if(jsonArray==null){
+            return;
+        }
+
+        for(int i=0; i<jsonArray.length(); i++)
+        {
+            JSONObject jsonObject=jsonArray.getJSONObject(i);
+            int id = jsonObject.getInt("id");
+            String title = jsonObject.getString("title");
+            String body = jsonObject.getString("body");
+
+            Note note = new Note(id, title, body);
+
+            NOTES.add(note);
+
+        }
 
     }
 

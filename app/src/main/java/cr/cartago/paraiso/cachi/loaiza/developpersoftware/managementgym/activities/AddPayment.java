@@ -130,12 +130,12 @@ public class AddPayment extends Activity {
 
         duracion = "una semana";
 
-        startDate = date.getDateForDB(date.getDateOfFirstDayInTheWeek());
+        startDate = date.getDateOfToday();
 
-        endDate = date.getDateForDB(date.getDateOfLastDayInTheWeek());
+        endDate = date.getDateForDB(date.getDateInAWeek());
 
-        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+date.getDateOfFirstDayInTheWeek()+
-                "\nhasta el: "+date.getDateOfLastDayInTheWeek()+"\nDuración: "+duracion;
+        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+Dates.getDateForShowUser(startDate)+
+                "\nhasta el: "+date.getDateInAWeek()+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
@@ -147,12 +147,12 @@ public class AddPayment extends Activity {
 
         duracion = "un mes";
 
-        startDate = date.getDateForDB(date.getDateOfTheFirstDayInTheCurrentMonth());
+        startDate = date.getDateOfToday();
 
-        endDate = date.getDateForDB(date.getDateOfTheLastDayInTheCurrentMonth());
+        endDate = date.getDateForDB(date.getDateInAMonth());
 
-        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+date.getDateOfTheFirstDayInTheCurrentMonth()+
-                "\nhasta el: "+date.getDateOfTheLastDayInTheCurrentMonth()+"\nDuración: "+duracion;
+        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+Dates.getDateForShowUser(date.getDateOfToday())+
+                "\nhasta el: "+date.getDateInAMonth()+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 

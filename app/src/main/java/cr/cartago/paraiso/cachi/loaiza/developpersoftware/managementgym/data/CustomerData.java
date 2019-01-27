@@ -1,7 +1,9 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data;
 
 
+import java.sql.Date;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
@@ -10,26 +12,69 @@ import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.P
 
 public class CustomerData {
 
+    public static int[] CUSTOMERS_HARD = {};
+
     public CustomerData(){
 
 
     }
 
 
-
-
     public static ArrayList<String> getNameAndLastNameFromListCustomer(ArrayList<Customer> listCustomers){
 
         ArrayList<String> listNamesAndLastNames = new ArrayList<>();
 
+        Dates dates = new Dates();
+
         for (Customer customer:listCustomers) {
 
-            listNamesAndLastNames.add(customer.getName()+" "+customer.getLastName());
+            String paymentAlert = "";
+
+            String customerHard = "";
+
+            //VERIFY IF THE CUSTOMER'S PAYMENT WILL BE FINISHED
+            if(theCustomerHaveCurrentPayment(customer.getCustomerId())){
+
+                Payment payment = getPaymentByIdCustomer(customer.getCustomerId());
+                Date date1 = Date.valueOf(dates.getDateOfToday());
+
+                Date date2 = Date.valueOf(payment.getPayDateEnd());
+
+                long diffInMillies = Math.abs(date2.getTime() - date1.getTime());
+
+                long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+                if(payment.getAmuntTime().equals("un mes") && diff<=5){
+                    paymentAlert = " ("+diff+")";
+                }else if(payment.getAmuntTime().equals("una semana") && diff<=2){
+                    paymentAlert = " ("+diff+")";
+                }
+
+            }
+
+            for(int i = 0; i<CUSTOMERS_HARD.length; i++){
+                if(CUSTOMERS_HARD[i]==customer.getCustomerId()){
+                    customerHard = " [*]";
+                }
+            }
+
+            listNamesAndLastNames.add(customer.getName()+" "+customer.getLastName()+paymentAlert+customerHard);
 
         }
 
         return listNamesAndLastNames;
 
+    }
+
+    public static Payment getPaymentByIdCustomer(int customerId){
+
+        for (Payment payment:
+             DBHelper.CUSTOMER_PAYMENTS) {
+            if(payment.getCustomerId()==customerId){
+                return payment;
+            }
+        }
+        return null;
     }
 
     public static ArrayList<String> getNameAndLastNameFromListCustomerInSpecificDay(ArrayList<Customer> listCustomers){
