@@ -82,7 +82,15 @@ public class MainActivity extends Activity {
 
         while (thread.isAlive()){}
 
-        if(CustomerData.verifyPartner(editText_username.getText().toString(), editText_password.getText().toString())){
+        String username = editText_username.getText().toString();
+
+        String password = editText_password.getText().toString();
+
+        if(CustomerData.verifyPartner(username, password)){
+            //TEST MODE: MODE IN WHICH I CAN DO MANY TYPES OF TEST WITHOUT INTERFERE WITH THE MAIN DATABASE
+            if(username.equals("test") && password.equals("test")){
+                Toast.makeText(this,"Modo TEST activado", Toast.LENGTH_LONG).show();
+            }
             Intent i = new Intent(MainActivity.this, Pesas.class);
             startActivity(i);
         }else{

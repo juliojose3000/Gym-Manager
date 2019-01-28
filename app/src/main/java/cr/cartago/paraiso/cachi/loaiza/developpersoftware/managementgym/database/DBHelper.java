@@ -25,7 +25,7 @@ import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.P
 public class DBHelper  {
 
     //public static String REST_API_PHP_URL = "http://192.168.1.6/proyectos_web/AppGym/CachiFitnessCenter%20REST%20API%20PHP/php_rest_cachi_fitness_center/api/";
-    public static String REST_API_PHP_URL = "https://loaiza.000webhostapp.com/php_rest_cachi_fitness_center/api/";
+    public static String REST_API_PHP_URL = "https://loaiza.000webhostapp.com/REST_API_PHP_CACHI_FITNESS_CENTER/REST_API/api/";
 
     public static ArrayList<Customer> CUSTOMERS;
     public static ArrayList<Customer> CUSTOMERS_TODAY;
@@ -112,6 +112,7 @@ public class DBHelper  {
             CUSTOMERS.add(customer);
 
         }
+        CUSTOMERS = CustomerData.sortAlphabeticallyList(CUSTOMERS);
     }
 
     public void getAllCustomersToday(String date) throws JSONException {
@@ -265,6 +266,8 @@ public class DBHelper  {
                 CUSTOMERS_FOR_ADD_TODAY.add(customer);
             }
         }
+
+        CUSTOMERS_FOR_ADD_TODAY = CustomerData.sortAlphabeticallyList(CUSTOMERS_FOR_ADD_TODAY);
 
     }
 

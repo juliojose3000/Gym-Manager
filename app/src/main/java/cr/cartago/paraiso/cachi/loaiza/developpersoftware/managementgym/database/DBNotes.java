@@ -2,7 +2,7 @@ package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.databas
 
 public class DBNotes {
 
-    public static final String SERVER_URL = DBHelper.REST_API_PHP_URL+"note/";
+    public static String SERVER_URL = DBHelper.REST_API_PHP_URL+"note/";
 
     public static String URL_Read(){
         return SERVER_URL+"read.php";

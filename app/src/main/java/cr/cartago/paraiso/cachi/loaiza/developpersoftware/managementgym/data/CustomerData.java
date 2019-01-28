@@ -1,8 +1,13 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data;
 
 
+import android.os.AsyncTask;
+
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
@@ -18,7 +23,6 @@ public class CustomerData {
 
 
     }
-
 
     public static ArrayList<String> getNameAndLastNameFromListCustomer(ArrayList<Customer> listCustomers){
 
@@ -97,7 +101,6 @@ public class CustomerData {
 
     }
 
-
     public static ArrayList<Customer> customerToSearch(String customerToSearch, ArrayList<Customer> customers){
 
         ArrayList<Customer> customersToSearch = new ArrayList<>();
@@ -147,7 +150,6 @@ public class CustomerData {
         return false;
 
     }
-
 
     public static boolean existsCustomerInCustomerOfToday(Customer customerToSearh){
 
@@ -275,6 +277,43 @@ public class CustomerData {
 
     public static boolean verifyPartner(String username, String password){
 
+        if(username.equals("test") && password.equals("test")){
+            DBHelper.REST_API_PHP_URL = "https://loaiza.000webhostapp.com/REST_API_PHP_CACHI_FITNESS_CENTER/REST_API_TEST/api/";
+            try {
+                new AsyncTask<Void, Void, Void>(){
+
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        new DBHelper();
+                        return null;
+                    }
+                }.execute().get();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
+
+        if(!DBHelper.REST_API_PHP_URL.equals("https://loaiza.000webhostapp.com/REST_API_PHP_CACHI_FITNESS_CENTER/REST_API/api/")){
+            DBHelper.REST_API_PHP_URL = "https://loaiza.000webhostapp.com/REST_API_PHP_CACHI_FITNESS_CENTER/REST_API/api/";
+            try {
+                new AsyncTask<Void, Void, Void>(){
+
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        new DBHelper();
+                        return null;
+                    }
+                }.execute().get();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         for (Partner partner:
                 DBHelper.PARTNERS) {
             if(partner.getUsername().equals(username) && partner.getPassword().equals(password)){
@@ -283,6 +322,20 @@ public class CustomerData {
         }
         return false;
 
+    }
+
+    public static ArrayList sortAlphabeticallyList(ArrayList<Customer> list){
+        if (list.size() > 0) {
+            Collections.sort(list, new Comparator<Customer>() {
+                @Override
+                public int compare(final Customer object1, final Customer object2) {
+                    String name1 = object1.getName()+" "+object1.getLastName();
+                    String name2 = object2.getName()+" "+object2.getLastName();
+                    return name1.compareTo(name2);
+                }
+            });
+        }
+        return list;
     }
 
 

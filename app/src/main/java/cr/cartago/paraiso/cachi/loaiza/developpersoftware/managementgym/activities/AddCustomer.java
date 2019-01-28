@@ -21,6 +21,7 @@ import java.text.Normalizer;
 import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 
@@ -141,8 +142,13 @@ public class AddCustomer extends Activity {
 
             int customerId = DBHelper.CUSTOMERS.get(DBHelper.CUSTOMERS.size()-1).getCustomerId()+1;
             Customer customer = new Customer(customerId,name, lastname, nickname, startdate);
+
             DBHelper.CUSTOMERS.add(customer);
             DBHelper.CUSTOMERS_FOR_ADD_TODAY.add(customer);
+
+            DBHelper.CUSTOMERS = CustomerData.sortAlphabeticallyList(DBHelper.CUSTOMERS);
+            DBHelper.CUSTOMERS_FOR_ADD_TODAY = CustomerData.sortAlphabeticallyList(DBHelper.CUSTOMERS_FOR_ADD_TODAY);
+
             cancel(null);
             Toast.makeText(this,"Se ha registrado el cliente exitosamente",Toast.LENGTH_LONG).show();
         }else{
