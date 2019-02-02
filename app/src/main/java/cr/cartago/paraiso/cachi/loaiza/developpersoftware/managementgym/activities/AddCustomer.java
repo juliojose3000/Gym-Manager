@@ -140,7 +140,8 @@ public class AddCustomer extends Activity {
 
         if(codeResponse==200){
 
-            int customerId = DBHelper.CUSTOMERS.get(DBHelper.CUSTOMERS.size()-1).getCustomerId()+1;
+            int customerId = DBHelper.CUSTOMERS.size()+1;
+
             Customer customer = new Customer(customerId,name, lastname, nickname, startdate);
 
             DBHelper.CUSTOMERS.add(customer);
