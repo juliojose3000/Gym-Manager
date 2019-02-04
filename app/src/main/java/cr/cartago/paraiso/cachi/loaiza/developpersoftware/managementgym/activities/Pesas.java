@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.concurrent.ExecutionException;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.MainActivity;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
@@ -35,6 +37,8 @@ public class Pesas extends Activity {
     private ArrayList<Customer> customersDefaulters;
 
     private ArrayAdapter<String> arrayAdapter;
+
+    private ArrayList<String> listCustomersToday;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +61,11 @@ public class Pesas extends Activity {
 
         customersDefaulters = DBHelper.CUSTOMERS_DEFAULTERS;
 
+        listCustomersToday = CustomerData.getNameAndLastNameFromListCustomer(DBHelper.CUSTOMERS_TODAY);
+
+        //--------------------------------------------//
         createAdapter();
+        //-----------------------------------------------------//
 
         listViewCustomers.setAdapter(arrayAdapter);
 
@@ -66,7 +74,7 @@ public class Pesas extends Activity {
     }
 
     public void createAdapter(){
-        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_checked, CustomerData.getNameAndLastNameFromListCustomer(DBHelper.CUSTOMERS_TODAY)) {
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_checked, listCustomersToday) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View row = super.getView(position, convertView, parent);
@@ -120,7 +128,29 @@ public class Pesas extends Activity {
                 return false;
             }
             i = new Intent(Pesas.this, CustomersArrivedInSpecificDay.class);
-        }
+        }/*else if(id == R.id.item_update_data){
+            if(!verifyInternetAccess()){
+                Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
+                return false;
+            }
+            try {
+                new AsyncTask<Void,Void,Void>(){
+
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        new DBHelper();
+                        return null;
+                    }
+                }.execute().get();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            listCustomersToday = CustomerData.getNameAndLastNameFromListCustomer(DBHelper.CUSTOMERS_TODAY);
+            arrayAdapter.notifyDataSetChanged();
+            return false;
+        }*/
         startActivity(i);
         return super.onOptionsItemSelected(item);
     }
