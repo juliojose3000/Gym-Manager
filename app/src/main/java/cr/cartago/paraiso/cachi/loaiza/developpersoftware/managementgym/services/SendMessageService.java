@@ -118,7 +118,7 @@ public class SendMessageService extends Service {
 
         Calendar calendar = Calendar.getInstance();
         int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-        SharedPreferences settings = getSharedPreferences("PREFS",0);
+        SharedPreferences settings = getSharedPreferences("PREFERENCES",0);
         int lastDay = settings.getInt("day",0);
 
         if(lastDay != currentDay){

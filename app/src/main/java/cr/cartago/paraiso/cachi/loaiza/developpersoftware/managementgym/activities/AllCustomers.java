@@ -50,7 +50,7 @@ public class AllCustomers extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                customerSelected = DBHelper.CUSTOMERS.get(position);
+                customerSelected = listCustomers.get(position);
 
             }
 
