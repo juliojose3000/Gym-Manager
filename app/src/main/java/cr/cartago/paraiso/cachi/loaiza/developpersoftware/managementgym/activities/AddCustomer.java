@@ -35,6 +35,8 @@ public class AddCustomer extends Activity {
 
     private EditText customerNickname;
 
+    private EditText customerPhone;
+
     private DatePickerDialog datePickerDialog;
 
     private Button buttonAccept;
@@ -70,6 +72,8 @@ public class AddCustomer extends Activity {
         customerNickname = findViewById(R.id.editText_customer_nickname);
 
         customerStartdate = findViewById(R.id.editText_customer_startdate);
+
+        customerPhone = findViewById(R.id.editText_customerPhone);
 
         buttonAccept = findViewById(R.id.button_accept_mainActivity);
 
@@ -109,6 +113,8 @@ public class AddCustomer extends Activity {
 
         customerNickname.setText("");
 
+        customerPhone.setText("");
+
     }
 
     public void addCustomer(View v){
@@ -126,7 +132,9 @@ public class AddCustomer extends Activity {
 
         nickname = stripAccents(this.customerNickname.getText().toString());
 
-        if(name.equals("") || lastname.equals("") || startdate.equals("")){
+        phoneNumber = customerPhone.getText().toString();
+
+        if(name.equals("") || lastname.equals("") || startdate.equals("") || phoneNumber.equals("")){
             Toast.makeText(this, "Solo el campo 'Conocido como' no es indispensable. Complete los demás.", Toast.LENGTH_LONG).show();
             return;
         }
@@ -135,10 +143,10 @@ public class AddCustomer extends Activity {
 
             @Override
             protected Void doInBackground(String... params) {
-                codeResponse = DBHelper.insertCustomer(params[0], params[1], params[2],params[3]);
+                codeResponse = DBHelper.insertCustomer(params[0], params[1], params[2],params[3], params[4]);
                 return null;
             }
-        }.execute(name, lastname, startdate, nickname);
+        }.execute(name, lastname, startdate, nickname, phoneNumber);
 
         if(codeResponse==200){
 

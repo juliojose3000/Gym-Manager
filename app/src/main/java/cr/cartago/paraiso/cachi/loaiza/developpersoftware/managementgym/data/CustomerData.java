@@ -17,8 +17,6 @@ import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.P
 
 public class CustomerData {
 
-    public static int[] CUSTOMERS_HARD = {};
-
     public CustomerData(){
 
 
@@ -330,6 +328,19 @@ public class CustomerData {
             });
         }
         return list;
+    }
+
+    public static String giveFormatPhone(String phoneNumber){
+
+        if(phoneNumber.equals("null")){
+            return "No registrado";
+        }
+
+        final int mid = phoneNumber.length() / 2; //get the middle of the String
+        String[] parts = {phoneNumber.substring(0, mid),phoneNumber.substring(mid)};
+
+        return parts[0]+"-"+parts[1];
+
     }
 
 

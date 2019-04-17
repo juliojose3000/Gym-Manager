@@ -171,7 +171,7 @@ public class DBHelper  {
 
     }
 
-    public static int insertCustomer(String name, String lastname, String dateStart, String nickname){
+    public static int insertCustomer(String name, String lastname, String dateStart, String nickname, String phoneNumber){
 
         int code = 0;
 
@@ -181,6 +181,7 @@ public class DBHelper  {
         params.put("customer_lastname",lastname);
         params.put("start_date",dateStart);
         params.put("customer_nickname",nickname);
+        params.put("phone_number",phoneNumber);
 
         HttpJsonParser httpJsonParser = new HttpJsonParser();
 

@@ -75,6 +75,8 @@ public class SeeDetailsCustomer extends Activity {
         customerDetails+="\n\nInició el: "+ Dates.getDateForShowUser(customer.getStarDate())
                 +"\n\n"+customerStatus;
 
+        customerDetails+="\n\nTeléfono: "+CustomerData.giveFormatPhone(customer.getPhoneNumber());
+
         textView_customerDetails = findViewById(R.id.textView_customer_details);
 
         textView_customerDetails.setText(customerDetails);

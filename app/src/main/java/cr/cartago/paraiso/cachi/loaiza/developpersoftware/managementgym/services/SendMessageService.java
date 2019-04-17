@@ -48,13 +48,12 @@ public class SendMessageService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         sendMessage();
+
         return START_STICKY;
     }
 
-
-    public void sendMessage(){
-
-        //if(!isNeededSendMenssage()){return;}
+    private void customersToSendMessage(){
+        if(!isNeededSendMenssage()){return;}
 
         Dates dates = new Dates();
 
@@ -90,6 +89,28 @@ public class SendMessageService extends Service {
             }
 
         }
+    }
+
+
+    public void sendMessage(){
+
+        new Thread(new Runnable(){
+            public void run() {
+                while(true)
+                {
+                    try {
+                        customersToSendMessage();
+                        Thread.sleep(21600000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    //REST OF CODE HERE//
+                }
+
+            }
+        }).start();
+
+
     }//end sendMessage
 
     //this method will execute only once a day for send a message to customers that will caducate the payment

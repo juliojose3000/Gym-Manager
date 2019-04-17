@@ -88,11 +88,9 @@ public class Pesas extends Activity {
             }
         }.execute();*/
 
-        sendMessage();
+        Intent i = new Intent(Pesas.this, SendMessageService.class);
 
-        /*Intent i = new Intent(Pesas.this, SendMessageService.class);
-
-        this.startService(i);*/
+        this.startService(i);
 
     }
 
