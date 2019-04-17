@@ -54,6 +54,8 @@ public class AddCustomer extends Activity {
 
     String nickname;
 
+    String phoneNumber;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -142,7 +144,7 @@ public class AddCustomer extends Activity {
 
             int customerId = DBHelper.CUSTOMERS.size()+1;
 
-            Customer customer = new Customer(customerId,name, lastname, nickname, startdate);
+            Customer customer = new Customer(customerId,name, lastname, nickname, startdate, "87349999");
 
             DBHelper.CUSTOMERS.add(customer);
             DBHelper.CUSTOMERS_FOR_ADD_TODAY.add(customer);

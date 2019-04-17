@@ -106,8 +106,9 @@ public class DBHelper  {
             String customerLastname = jsonObject.getString("customer_lastname");
             String startDate = jsonObject.getString("start_date");
             String customerNickname = jsonObject.getString("customer_nickname");
+            String phoneNumber = jsonObject.getString("phone_number");
 
-            customer = new Customer(customerId, customerName, customerLastname, customerNickname, startDate);
+            customer = new Customer(customerId, customerName, customerLastname, customerNickname, startDate, phoneNumber);
 
             CUSTOMERS.add(customer);
 

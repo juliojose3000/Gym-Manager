@@ -3,6 +3,7 @@ package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activit
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -18,15 +19,21 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.MainActivity;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Dates;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Message;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Payment;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.services.SendMessageService;
 
 public class Pesas extends Activity {
 
@@ -39,6 +46,8 @@ public class Pesas extends Activity {
     private ArrayAdapter<String> arrayAdapter;
 
     private ArrayList<String> listCustomersToday;
+
+    private SendMessageService sendMessageService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +79,20 @@ public class Pesas extends Activity {
         listViewCustomers.setAdapter(arrayAdapter);
 
         listViewCustomers.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+        /*new AsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground(Void... voids) {
+                sendMessage();
+                return null;
+            }
+        }.execute();*/
+
+        sendMessage();
+
+        /*Intent i = new Intent(Pesas.this, SendMessageService.class);
+
+        this.startService(i);*/
 
     }
 
@@ -155,7 +178,6 @@ public class Pesas extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-
     public void addCustomersToday(View v){
 
         if(!verifyInternetAccess()){
@@ -168,7 +190,6 @@ public class Pesas extends Activity {
         startActivity(i);
 
     }
-
 
     public void addPayment(View v){
 
@@ -213,7 +234,6 @@ public class Pesas extends Activity {
         startActivity(i);
     }
 
-
     public boolean verifyInternetAccess(){
 
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -226,6 +246,61 @@ public class Pesas extends Activity {
         }
         else
             return false;
+
+    }
+
+    public void sendMessage(){
+
+        //if(!isNeededSendMenssage()){return;}
+
+        Dates dates = new Dates();
+
+        for (Customer customer:DBHelper.CUSTOMERS) {
+
+            //VERIFY IF THE CUSTOMER'S PAYMENT WILL BE FINISHED
+            if(CustomerData.theCustomerHaveCurrentPayment(customer.getCustomerId())){
+
+                Payment payment = CustomerData.getPaymentByIdCustomer(customer.getCustomerId());
+
+                Date date1 = Date.valueOf(dates.getDateOfToday());
+
+                Date date2 = Date.valueOf(payment.getPayDateEnd());
+
+                long diffInMillies = Math.abs(date2.getTime() - date1.getTime());
+
+                long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+                String endPayment = Dates.getDateForShowUser(date2.toString());
+
+                if(payment.getAmuntTime().equals("un mes") && diff==3){
+                    Message message = new Message(customer.getPhoneNumber(), customer.getName(), endPayment);
+                    message.sendMessage(Pesas.this);
+                }
+
+            }
+
+        }
+    }//end sendMessage
+
+    //this method will execute only once a day for send a message to customers that will caducate the payment
+    private boolean isNeededSendMenssage(){
+
+        Calendar calendar = Calendar.getInstance();
+        int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+        SharedPreferences settings = getSharedPreferences("PREFS",0);
+        int lastDay = settings.getInt("day",0);
+
+        if(lastDay != currentDay){
+
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putInt("day", currentDay);
+            editor.commit();
+
+            return true;
+
+        }
+
+        return false;
 
     }
 

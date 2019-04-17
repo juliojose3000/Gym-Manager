@@ -56,12 +56,6 @@ public class CustomerData {
 
             }
 
-            for(int i = 0; i<CUSTOMERS_HARD.length; i++){
-                if(CUSTOMERS_HARD[i]==customer.getCustomerId()){
-                    customerHard = " [*]";
-                }
-            }
-
             listNamesAndLastNames.add(customer.getName()+" "+customer.getLastName()+paymentAlert+customerHard);
 
         }

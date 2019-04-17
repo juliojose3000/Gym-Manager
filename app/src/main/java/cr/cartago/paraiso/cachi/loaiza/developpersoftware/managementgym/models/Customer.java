@@ -16,18 +16,29 @@ public class Customer {
 
     private int daysToPay;
 
+    private String phoneNumber;
 
-    public Customer(int customerId, String name, String lastName, String nickname, String starDate) {
+
+    public Customer(int customerId, String name, String lastName, String nickname, String starDate, String phoneNumber) {
         this.customerId = customerId;
         this.name = name;
         this.lastName = lastName;
         this.nickname = nickname;
         this.starDate = starDate;
+        this.phoneNumber = phoneNumber;
     }
 
 
 
     public Customer() {
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public int getDaysToPay() {
