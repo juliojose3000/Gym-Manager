@@ -41,6 +41,8 @@
         <activity android:name=".activities.Notes"></activity>
 
         <service android:name=".services.SendMessageService"></service>
+        <service android:name=".services.YourJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>

@@ -1,12 +1,13 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.services;
 
-import android.app.Service;
+import android.app.job.JobInfo;
+import android.app.job.JobParameters;
+import android.app.job.JobScheduler;
+import android.app.job.JobService;
+import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
 
 import java.sql.Date;
 import java.util.Calendar;
@@ -20,45 +21,57 @@ import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Payment;
 
-public class SendMessageService extends Service {
+public class YourJobService extends JobService {
 
-    public SendMessageService(){
+    private static final int JOB_ID = 1;
+    public static final long ONE_MINUTE_INTERVAL = 10 * 1000L;
+    public static final long ONE_DAY_INTERVAL = 24 * 60 * 60 * 1000L; // 1 Day
+    public static final long ONE_WEEK_INTERVAL = 7 * 24 * 60 * 60 * 1000L; // 1 Week
 
+    public static Context contexto;
+
+    public static void schedule(Context context, long intervalMillis) {
+        contexto = context;
+        JobScheduler jobScheduler = (JobScheduler)
+                context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        ComponentName componentName =
+                new ComponentName(context, YourJobService.class);
+        JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, componentName);
+        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+        builder.setPeriodic(intervalMillis);
+        jobScheduler.schedule(builder.build());
     }
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-
-    @Override
-    public void onCreate() {
-
-        super.onCreate();
-
+    public static void cancel(Context context) {
+        JobScheduler jobScheduler = (JobScheduler)
+                context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        jobScheduler.cancel(JOB_ID);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public boolean onStartJob(final JobParameters params) {
+        customersToSendMessage();
+        if (false) {
+            // To finish a periodic JobService,
+            // you must cancel it, so it will not be scheduled more.
+            YourJobService.cancel(this);
+        }
+
+        // false when it is synchronous.
+        return false;
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        sendMessage();
-
-        return START_STICKY;
+    public boolean onStopJob(JobParameters params) {
+        return false;
     }
 
     private void customersToSendMessage(){
-
         //if(!isNeededSendMenssage()){return;}
 
         Dates dates = new Dates();
 
-        for (final Customer customer:DBHelper.CUSTOMERS) {
+        for (final Customer customer: DBHelper.CUSTOMERS) {
 
             //VERIFY IF THE CUSTOMER'S PAYMENT WILL BE FINISHED
             if(CustomerData.theCustomerHaveCurrentPayment(customer.getCustomerId())){
@@ -80,7 +93,7 @@ public class SendMessageService extends Service {
                         @Override
                         protected Void doInBackground(Void... voids) {
                             Message message = new Message(customer.getPhoneNumber(), customer.getName(), endPayment);
-                            message.sendMessage(SendMessageService.this);
+                            message.sendMessage(contexto);
                             return null;
                         }
                     }.execute();
@@ -91,28 +104,6 @@ public class SendMessageService extends Service {
 
         }
     }
-
-
-    public void sendMessage(){
-
-        new Thread(new Runnable(){
-            public void run() {
-                while(true)
-                {
-                    try {
-                        customersToSendMessage();
-                        Thread.sleep(21600000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    //REST OF CODE HERE//
-                }
-
-            }
-        }).start();
-
-
-    }//end sendMessage
 
     //this method will execute only once a day for send a message to customers that will caducate the payment
     private boolean isNeededSendMenssage(){

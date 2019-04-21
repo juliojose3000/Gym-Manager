@@ -1,6 +1,8 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activities;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +11,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +37,7 @@ import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Payment;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.services.SendMessageService;
+import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.services.YourJobService;
 
 public class Pesas extends Activity {
 
@@ -80,17 +84,20 @@ public class Pesas extends Activity {
 
         listViewCustomers.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-        /*new AsyncTask<Void, Void, Void>(){
+        new AsyncTask<Void, Void, Void>(){
             @Override
             protected Void doInBackground(Void... voids) {
                 sendMessage();
                 return null;
             }
-        }.execute();*/
+        }.execute();
 
-        Intent i = new Intent(Pesas.this, SendMessageService.class);
+        /*Intent i = new Intent(Pesas.this, SendMessageService.class);
 
-        this.startService(i);
+        this.startService(i);*/
+
+        //YourJobService.schedule(this, YourJobService.ONE_MINUTE_INTERVAL);
+
 
     }
 
@@ -253,6 +260,8 @@ public class Pesas extends Activity {
 
         Dates dates = new Dates();
 
+        String customersSentMennsage = "";
+
         for (Customer customer:DBHelper.CUSTOMERS) {
 
             //VERIFY IF THE CUSTOMER'S PAYMENT WILL BE FINISHED
@@ -272,13 +281,44 @@ public class Pesas extends Activity {
 
                 if(payment.getAmuntTime().equals("un mes") && diff==3){
                     Message message = new Message(customer.getPhoneNumber(), customer.getName(), endPayment);
-                    message.sendMessage(Pesas.this);
+                    //message.sendMessage(Pesas.this);
+                    customersSentMennsage+=customer.getName()+" "+customer.getLastName()+", ";
                 }
 
             }
 
         }
+        Toast.makeText(getApplicationContext(), "JAJAAJ", Toast.LENGTH_LONG).show();
+        sendNotify(removeTheLastMark(customersSentMennsage));
+
     }//end sendMessage
+
+    private String removeTheLastMark(String str) {
+        if (str != null && str.length() > 0 && str.charAt(str.length() - 2) == 'x') {
+            str = str.substring(0, str.length() - 2);
+        }
+        return str;
+    }
+
+    private void sendNotify(String customersSentMennsage){
+
+        NotificationManager notif = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Notification notify = new Notification.Builder(getApplicationContext()).
+                setContentTitle(customersSentMennsage).setContentText(customersSentMennsage).
+                setContentTitle("Se ha enviado un mensaje a: ").setSmallIcon(R.drawable.ic_launcher_foreground).build();
+
+
+        notify.flags |= Notification.FLAG_AUTO_CANCEL;
+        notif.notify(0,notify);
+
+    }
+
+    private void displayNotification(){
+
+
+
+    }
 
     //this method will execute only once a day for send a message to customers that will caducate the payment
     private boolean isNeededSendMenssage(){
