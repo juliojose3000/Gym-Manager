@@ -1,7 +1,11 @@
 package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data;
 
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
@@ -9,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.telephony.SmsManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -43,7 +48,7 @@ public class Message {
         }
 
         String sms = "Buenos días "+customerName+", de parte del gimnacio Cachí Fitness Center, se le informa que su mensualidad caduca este "+this.endPayment+". Se agradece la puntualidad en los pagos.";
-        //String sms = "Buenos dias "+customerName;
+
         String phoneNum = this.customerNumberPhone;
         if(!TextUtils.isEmpty(sms) && !TextUtils.isEmpty(phoneNum)) {
 
@@ -55,7 +60,7 @@ public class Message {
 
             //Send the SMS//
             smsManager.sendMultipartTextMessage(phoneNum, null, parts, null, null);
-            //smsManager.sendTextMessage(phoneNum, null, sms, null, null);
+            smsManager.sendTextMessage(phoneNum, null, sms, null, null);
 
         }
     }
@@ -74,6 +79,8 @@ public class Message {
         ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.SEND_SMS}, PERMISSION_REQUEST_CODE);
 
     }
+
+
 
 
 }

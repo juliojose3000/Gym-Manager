@@ -3,8 +3,11 @@ package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activit
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -12,6 +15,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.telephony.SmsManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,6 +57,8 @@ public class Pesas extends Activity {
 
     private SendMessageService sendMessageService;
 
+    private String customerToSentMessage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -84,20 +90,13 @@ public class Pesas extends Activity {
 
         listViewCustomers.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-        new AsyncTask<Void, Void, Void>(){
+        runOnUiThread(new Runnable(){//this method allow to show the toast message about sent messages
+
             @Override
-            protected Void doInBackground(Void... voids) {
+            public void run(){
                 sendMessage();
-                return null;
             }
-        }.execute();
-
-        /*Intent i = new Intent(Pesas.this, SendMessageService.class);
-
-        this.startService(i);*/
-
-        //YourJobService.schedule(this, YourJobService.ONE_MINUTE_INTERVAL);
-
+        });
 
     }
 
@@ -156,29 +155,14 @@ public class Pesas extends Activity {
                 return false;
             }
             i = new Intent(Pesas.this, CustomersArrivedInSpecificDay.class);
-        }/*else if(id == R.id.item_update_data){
-            if(!verifyInternetAccess()){
-                Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
-                return false;
-            }
-            try {
-                new AsyncTask<Void,Void,Void>(){
+        }else if(id == R.id.item_customers_to_sent_message) {
 
-                    @Override
-                    protected Void doInBackground(Void... voids) {
-                        new DBHelper();
-                        return null;
-                    }
-                }.execute().get();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            listCustomersToday = CustomerData.getNameAndLastNameFromListCustomer(DBHelper.CUSTOMERS_TODAY);
-            arrayAdapter.notifyDataSetChanged();
-            return false;
-        }*/
+            i = new Intent(Pesas.this, CustomersToSentMessage.class);
+            sentMessagesTo();
+            i.putExtra("customers", this.customerToSentMessage);
+
+        }
+
         startActivity(i);
         return super.onOptionsItemSelected(item);
     }
@@ -256,13 +240,13 @@ public class Pesas extends Activity {
 
     public void sendMessage(){
 
-        //if(!isNeededSendMenssage()){return;}
+        if(!isNeededSendMenssage()){return;}
+
+        Toast.makeText(Pesas.this, "Se enviarán mensajes de advertencia...", Toast.LENGTH_LONG).show();
 
         Dates dates = new Dates();
 
-        String customersSentMennsage = "";
-
-        for (Customer customer:DBHelper.CUSTOMERS) {
+        for (final Customer customer:DBHelper.CUSTOMERS) {
 
             //VERIFY IF THE CUSTOMER'S PAYMENT WILL BE FINISHED
             if(CustomerData.theCustomerHaveCurrentPayment(customer.getCustomerId())){
@@ -277,30 +261,60 @@ public class Pesas extends Activity {
 
                 long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
-                String endPayment = Dates.getDateForShowUser(date2.toString());
+                final String endPayment = Dates.getDateForShowUser(date2.toString());
 
                 if(payment.getAmuntTime().equals("un mes") && diff==3){
+
                     Message message = new Message(customer.getPhoneNumber(), customer.getName(), endPayment);
-                    //message.sendMessage(Pesas.this);
-                    customersSentMennsage+=customer.getName()+" "+customer.getLastName()+", ";
+
+                    message.sendMessage(Pesas.this);
+
                 }
 
             }
 
         }
-        Toast.makeText(getApplicationContext(), "JAJAAJ", Toast.LENGTH_LONG).show();
-        sendNotify(removeTheLastMark(customersSentMennsage));
 
     }//end sendMessage
 
-    private String removeTheLastMark(String str) {
-        if (str != null && str.length() > 0 && str.charAt(str.length() - 2) == 'x') {
-            str = str.substring(0, str.length() - 2);
-        }
-        return str;
-    }
+    public void sentMessagesTo(){
 
-    private void sendNotify(String customersSentMennsage){
+        Dates dates = new Dates();
+
+        String customersSentMennsage = "";
+
+        for (final Customer customer:DBHelper.CUSTOMERS) {
+
+            //VERIFY IF THE CUSTOMER'S PAYMENT WILL BE FINISHED
+            if(CustomerData.theCustomerHaveCurrentPayment(customer.getCustomerId())){
+
+                Payment payment = CustomerData.getPaymentByIdCustomer(customer.getCustomerId());
+
+                Date date1 = Date.valueOf(dates.getDateOfToday());
+
+                Date date2 = Date.valueOf(payment.getPayDateEnd());
+
+                long diffInMillies = Math.abs(date2.getTime() - date1.getTime());
+
+                long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+                final String endPayment = Dates.getDateForShowUser(date2.toString());
+
+                if(payment.getAmuntTime().equals("un mes") && diff==3){
+
+                    customersSentMennsage+=customer.getName()+" "+customer.getLastName()+"\n\n";
+
+                }
+
+            }
+
+        }
+        this.customerToSentMessage = customersSentMennsage;
+
+    }//end sendMessage
+
+
+    private void displayNotification(String customersSentMennsage){
 
         NotificationManager notif = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -314,18 +328,12 @@ public class Pesas extends Activity {
 
     }
 
-    private void displayNotification(){
-
-
-
-    }
-
     //this method will execute only once a day for send a message to customers that will caducate the payment
     private boolean isNeededSendMenssage(){
 
         Calendar calendar = Calendar.getInstance();
         int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-        SharedPreferences settings = getSharedPreferences("PREFS",0);
+        SharedPreferences settings = getSharedPreferences("PREFERENCES3",0);
         int lastDay = settings.getInt("day",0);
 
         if(lastDay != currentDay){
@@ -341,5 +349,6 @@ public class Pesas extends Activity {
         return false;
 
     }
+
 
 }
