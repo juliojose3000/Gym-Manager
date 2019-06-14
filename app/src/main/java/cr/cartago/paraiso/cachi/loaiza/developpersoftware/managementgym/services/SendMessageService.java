@@ -80,7 +80,7 @@ public class SendMessageService extends Service {
                         @Override
                         protected Void doInBackground(Void... voids) {
                             Message message = new Message(customer.getPhoneNumber(), customer.getName(), endPayment);
-                            message.sendMessage(SendMessageService.this);
+                            message.sendMessage(SendMessageService.this, 1);
                             return null;
                         }
                     }.execute();

@@ -93,7 +93,7 @@ public class YourJobService extends JobService {
                         @Override
                         protected Void doInBackground(Void... voids) {
                             Message message = new Message(customer.getPhoneNumber(), customer.getName(), endPayment);
-                            message.sendMessage(contexto);
+                            message.sendMessage(contexto, 1);
                             return null;
                         }
                     }.execute();

@@ -59,6 +59,10 @@ public class Pesas extends Activity {
 
     private String customerToSentMessage;
 
+    private int WARNING_MESSAGE = 0;
+
+    private int EXPIRATION_MESSAGE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -242,8 +246,6 @@ public class Pesas extends Activity {
 
         if(!isNeededSendMenssage()){return;}
 
-        Toast.makeText(Pesas.this, "Se enviarán mensajes de advertencia...", Toast.LENGTH_LONG).show();
-
         Dates dates = new Dates();
 
         for (final Customer customer:DBHelper.CUSTOMERS) {
@@ -263,12 +265,24 @@ public class Pesas extends Activity {
 
                 final String endPayment = Dates.getDateForShowUser(date2.toString());
 
-                if(payment.getAmuntTime().equals("un mes") && diff==3){
+                boolean itHaveSentMessage = false;
+
+                if(payment.getAmuntTime().equals("un mes")){
 
                     Message message = new Message(customer.getPhoneNumber(), customer.getName(), endPayment);
 
-                    message.sendMessage(Pesas.this);
+                    if(diff==3){
+                        message.sendMessage(Pesas.this, WARNING_MESSAGE);
+                    }else if(diff==0){
+                        message.sendMessage(Pesas.this, EXPIRATION_MESSAGE);
+                    }
 
+                    itHaveSentMessage = true;
+
+                }
+
+                if(itHaveSentMessage){
+                    Toast.makeText(Pesas.this, "Se han enviado mensajes de advertencia", Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -298,11 +312,15 @@ public class Pesas extends Activity {
 
                 long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
-                final String endPayment = Dates.getDateForShowUser(date2.toString());
-
                 if(payment.getAmuntTime().equals("un mes") && diff==3){
 
-                    customersSentMennsage+=customer.getName()+" "+customer.getLastName()+"\n\n";
+                    customersSentMennsage+=customer.getName()+" "+customer.getLastName()+" (Advertencia)\n\n";
+
+                }
+
+                if(payment.getAmuntTime().equals("un mes") && diff==0){
+
+                    customersSentMennsage+=customer.getName()+" "+customer.getLastName()+" (Caducidad)\n\n";
 
                 }
 
@@ -333,7 +351,7 @@ public class Pesas extends Activity {
 
         Calendar calendar = Calendar.getInstance();
         int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-        SharedPreferences settings = getSharedPreferences("PREFERENCES3",0);
+        SharedPreferences settings = getSharedPreferences("PREFERENCES5",0);
         int lastDay = settings.getInt("day",0);
 
         if(lastDay != currentDay){

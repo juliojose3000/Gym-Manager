@@ -37,7 +37,7 @@ public class Message {
 
     }
 
-    public void sendMessage(Context context){
+    public void sendMessage(Context context, int messageType){
 
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkPermission(context)) {
@@ -47,7 +47,13 @@ public class Message {
             }
         }
 
-        String sms = "Buenos días "+customerName+", de parte del gimnacio Cachí Fitness Center, se le informa que su mensualidad caduca este "+this.endPayment+". Se agradece la puntualidad en los pagos.";
+        String sms = "";
+
+        if(messageType==0){
+            sms = "Buenos días "+customerName+", de parte del gimnacio Cachí Fitness Center, se le informa que su mensualidad caduca este "+this.endPayment+". Se agradece la puntualidad en los pagos.";
+        }else if(messageType==1){
+            sms = "Buenos días "+customerName+", de parte del gimnacio Cachí Fitness Center, se le informa que su mensualidad caduca el día de hoy. Se agradece la puntualidad en los pagos.";
+        }
 
         String phoneNum = this.customerNumberPhone;
         if(!TextUtils.isEmpty(sms) && !TextUtils.isEmpty(phoneNum)) {
@@ -60,10 +66,11 @@ public class Message {
 
             //Send the SMS//
             smsManager.sendMultipartTextMessage(phoneNum, null, parts, null, null);
-            smsManager.sendTextMessage(phoneNum, null, sms, null, null);
+            //smsManager.sendTextMessage(phoneNum, null, sms, null, null);
 
         }
     }
+
 
     private boolean checkPermission(Context context) {
         int result = ContextCompat.checkSelfPermission(context, android.Manifest.permission.SEND_SMS);
