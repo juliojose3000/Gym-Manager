@@ -3,8 +3,10 @@ package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activit
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -31,6 +33,12 @@ public class AllCustomers extends Activity {
 
     private ArrayList<Customer> listCustomers;
 
+    private ArrayAdapter<String> arrayAdapter;
+
+    private ArrayList<Customer> customersDefaulters;
+
+    private ArrayList<Customer> customerWithCurrentPayment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -44,7 +52,17 @@ public class AllCustomers extends Activity {
 
         listCustomers = DBHelper.CUSTOMERS;
 
-        fillLisViewCustomers();
+        customersDefaulters = DBHelper.CUSTOMERS_DEFAULTERS;
+
+        customerWithCurrentPayment = DBHelper.CUSTOMERS_WITH_CURRENT_PAYMENT;
+
+        createAdapter();
+
+        listViewCustomers.setAdapter(arrayAdapter);
+
+        listViewCustomers.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+        //fillLisViewCustomers();
 
         listViewCustomers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -57,6 +75,42 @@ public class AllCustomers extends Activity {
         });
 
 
+    }
+
+    public void createAdapter(){
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_checked, CustomerData.getNameAndLastNameFromListCustomer(listCustomers)) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View row = super.getView(position, convertView, parent);
+
+                row.setBackgroundColor (Color.TRANSPARENT); // default coloe
+
+                for (Customer customer:
+                        customersDefaulters) {
+
+                    String item = listCustomers.get(position).getName()+" "+listCustomers.get(position).getLastName();
+
+                    if(item.equals(customer.getName()+" "+customer.getLastName()))
+                    {
+                        row.setBackgroundColor (Color.argb(100,255,0,0)); // some color
+                    }
+                }
+
+                for (Customer customer:
+                        customerWithCurrentPayment) {
+
+                    String item = listCustomers.get(position).getName()+" "+listCustomers.get(position).getLastName();
+
+                    if(item.equals(customer.getName()+" "+customer.getLastName()))
+                    {
+                        row.setBackgroundColor (Color.argb(100,0,255,0)); // some color
+                    }
+                }
+
+
+                return row;
+            }
+        };
     }
 
 
@@ -104,7 +158,11 @@ public class AllCustomers extends Activity {
 
         listCustomers = CustomerData.customerToSearch(nameCustomerToSearch, DBHelper.CUSTOMERS);
 
-        fillLisViewCustomers();
+        createAdapter();
+
+        listViewCustomers.setAdapter(arrayAdapter);
+
+        listViewCustomers.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         hideKeyboard();
 

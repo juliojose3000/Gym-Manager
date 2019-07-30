@@ -26,6 +26,7 @@ public class DBHelper  {
 
     //public static String REST_API_PHP_URL = "http://192.168.1.6/proyectos_web/AppGym/CachiFitnessCenter%20REST%20API%20PHP/php_rest_cachi_fitness_center/api/";
     public static String REST_API_PHP_URL = "https://loaiza.000webhostapp.com/REST_API_PHP_CACHI_FITNESS_CENTER/REST_API/api/";
+    //public static String REST_API_PHP_URL = "http://loaiza.hostingerapp.com/REST_API_PHP_CACHI_FITNESS_CENTER/REST_API/api/";
 
     public static ArrayList<Customer> CUSTOMERS;
     public static ArrayList<Customer> CUSTOMERS_TODAY;
@@ -424,6 +425,24 @@ public class DBHelper  {
 
             NOTES.add(note);
 
+        }
+
+    }
+
+    public static void deletePayment(String customerPayId){
+
+        Map<String, String> params = new HashMap<>();
+
+        params.put("customer_pay_id",customerPayId);
+
+        HttpJsonParser httpJsonParser = new HttpJsonParser();
+
+        try {
+            httpJsonParser.sendJson(DBCustomerPay.URL_Delete_Payment(), params);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
     }

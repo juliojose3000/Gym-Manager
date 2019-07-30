@@ -22,4 +22,8 @@ public class DBCustomerPay {
     public static String URL_Customers_With_Current_Payment(){
         return DBHelper.REST_API_PHP_URL+"customer_pay/with_current_payment.php";
     }
+
+    public static String URL_Delete_Payment(){
+        return DBHelper.REST_API_PHP_URL+"customer_pay/delete.php";
+    }
 }
