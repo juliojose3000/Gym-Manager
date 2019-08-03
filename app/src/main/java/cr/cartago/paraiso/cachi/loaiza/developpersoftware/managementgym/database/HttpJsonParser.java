@@ -114,6 +114,10 @@ public class HttpJsonParser {
         Log.i("STATUS", String.valueOf(conn.getResponseCode()));
         Log.i("MSG" , conn.getResponseMessage());
 
+        String x = String.valueOf(conn.getResponseCode());
+        String y  = conn.getResponseMessage();
+
+
         conn.disconnect();
 
         return conn.getResponseCode();

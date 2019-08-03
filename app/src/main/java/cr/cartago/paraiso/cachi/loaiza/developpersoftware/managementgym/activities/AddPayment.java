@@ -201,15 +201,20 @@ public class AddPayment extends Activity {
             //Toast.makeText(this, customerName+" tiene un pago todavía vigente", Toast.LENGTH_LONG).show();
             AlertDialog diaBox = AskOption();
             diaBox.show();
+
+
         }
 
     }
 
     private void doPay(){
+
         new Thread(){
             public void run(){
+
+                //int nextId = DBHelper.LIST_PAYMENTS.get(DBHelper.LIST_PAYMENTS.size()-1).getPaymentId()+1;
                 DBHelper.addPaymentFromCustomer(customerId, startDate, endDate, duracion);
-                DBHelper.CUSTOMER_PAYMENTS.add(new Payment(customerId, startDate, endDate, duracion));
+                DBHelper.LIST_PAYMENTS.add(new Payment(customerId, startDate, endDate, duracion));
                 DBHelper.CUSTOMERS_WITH_CURRENT_PAYMENT.add(CustomerData.getCustomerById(customerId));
             }
         }.start();
@@ -240,20 +245,59 @@ public class AddPayment extends Activity {
     }
 
 
-    private void deletePayment(){
-        new Thread(){
+    private void updatePayment(){
+
+        /*new Thread(){
             public void run(){
+
+                Customer customer = CustomerData.getCustomerById(customerId);
+
+                Payment currentPayment = CustomerData.getPaymentByIdCustomer(customer.getCustomerId());
+
+                DBHelper.deletePayment(""+currentPayment.getPaymentId());
+
+            }
+        }.start();*/
+
+
+        new Thread(){
+
+            public void run(){
+
+                int nextId = DBHelper.LIST_PAYMENTS.get(DBHelper.LIST_PAYMENTS.size()-1).getPaymentId()+1;
+
                 DBHelper.addPaymentFromCustomer(customerId, startDate, endDate, duracion);
-                DBHelper.CUSTOMER_PAYMENTS.add(new Payment(customerId, startDate, endDate, duracion));
-                DBHelper.CUSTOMERS_WITH_CURRENT_PAYMENT.add(CustomerData.getCustomerById(customerId));
+
+                DBHelper.LIST_PAYMENTS.add(new Payment(nextId,customerId, startDate, endDate, duracion));
             }
         }.start();
+
+
+        if(CustomerData.theCustomerIsDefaulter(customerId)){//If the customer is defaulter, so delete the days covered by the payment
+
+            isHeNoLongerADefaulter();
+
+            new AsyncTask<Void, Void, Void>(){
+
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    DBHelper.deleteDaysForPayByCoveredPay(customerId, startDate);
+                    try {
+                        DBHelper.getAllCustomersDefaulters();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            }.execute();
+
+        }
+
+
     }
 
     private AlertDialog AskOption()
     {
-
-        Customer customer = CustomerData.getCustomerById(customerId);
 
         AlertDialog myQuittingDialogBox =new AlertDialog.Builder(this)
                 //set message, title, and icon
@@ -261,10 +305,14 @@ public class AddPayment extends Activity {
                 .setMessage("El cliente "+customerName+" ya tiene un pago asignado. ¿Seguro que quieres agregar un nuevo pago?")
 
 
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialog, int whichButton) {
+
+                        updatePayment();
+
                         doPay();
+
                         dialog.dismiss();
                     }
 
@@ -272,7 +320,7 @@ public class AddPayment extends Activity {
 
 
 
-                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         //do nothing
                         dialog.dismiss();

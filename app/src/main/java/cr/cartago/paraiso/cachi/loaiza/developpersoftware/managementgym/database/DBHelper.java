@@ -6,8 +6,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +31,7 @@ public class DBHelper  {
     public static ArrayList<Customer> CUSTOMERS_FOR_ADD_TODAY;
     public static ArrayList<Customer> CUSTOMERS_WITH_CURRENT_PAYMENT;
     public static ArrayList<Customer> CUSTOMERS_DEFAULTERS;
-    public static ArrayList<Payment>  CUSTOMER_PAYMENTS;
+    public static ArrayList<Payment>  LIST_PAYMENTS;
     public static ArrayList<Partner>  PARTNERS;
     public static ArrayList<Note>     NOTES;
 
@@ -142,7 +140,7 @@ public class DBHelper  {
 
     public void getAllCustomersWithCurrentPayment(String date) throws JSONException {
 
-        CUSTOMER_PAYMENTS = new ArrayList<>();
+        LIST_PAYMENTS = new ArrayList<>();
 
         CUSTOMERS_WITH_CURRENT_PAYMENT = new ArrayList<>();
 
@@ -163,8 +161,7 @@ public class DBHelper  {
             String endPay = jsonObject.getString("pay_end");
             String amountTime = jsonObject.getString("amount_time");
 
-            CUSTOMER_PAYMENTS.add(new Payment(customerPayId, customerId, startPay, endPay, amountTime));
-
+            LIST_PAYMENTS.add(new Payment(customerPayId, customerId, startPay, endPay, amountTime));
 
             CUSTOMERS_WITH_CURRENT_PAYMENT.add(CustomerData.getCustomerById(customerId));
 

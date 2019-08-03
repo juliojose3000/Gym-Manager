@@ -64,13 +64,15 @@ public class CustomerData {
 
     public static Payment getPaymentByIdCustomer(int customerId){
 
+        Payment paymentToReturn = null;
+
         for (Payment payment:
-             DBHelper.CUSTOMER_PAYMENTS) {
+             DBHelper.LIST_PAYMENTS) {
             if(payment.getCustomerId()==customerId){
-                return payment;
+                paymentToReturn = payment;
             }
         }
-        return null;
+        return paymentToReturn;
     }
 
     public static ArrayList<String> getNameAndLastNameFromListCustomerInSpecificDay(ArrayList<Customer> listCustomers){
@@ -199,10 +201,9 @@ public class CustomerData {
         Payment payment = null;
 
         for (Payment currentPayment:
-                DBHelper.CUSTOMER_PAYMENTS) {
+                DBHelper.LIST_PAYMENTS) {
             if(currentPayment.getCustomerId()==customerId){
                 payment = currentPayment;
-                break;
             }
         }
 
@@ -340,6 +341,11 @@ public class CustomerData {
         String[] parts = {phoneNumber.substring(0, mid),phoneNumber.substring(mid)};
 
         return parts[0]+"-"+parts[1];
+
+    }
+
+    public static void updatePayment(int customerId, Payment payment){
+
 
     }
 
