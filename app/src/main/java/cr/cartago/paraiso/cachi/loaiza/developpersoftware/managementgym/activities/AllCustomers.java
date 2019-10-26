@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -69,11 +72,9 @@ public class AllCustomers extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 customerSelected = listCustomers.get(position);
-
             }
 
         });
-
 
     }
 
@@ -169,5 +170,66 @@ public class AllCustomers extends Activity {
     }
 
 
+    public void addPayment(View v){
 
+        if(!verifyInternetAccess()){
+            Toast.makeText(this,"Verifique su conexión a internet e intente de nuevo",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if(customerSelected==null){
+            Toast.makeText(this,"Seleccione un cliente",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Intent i = new Intent(AllCustomers.this, AddPayment.class);
+
+        i.putExtra("customer_name", customerSelected.getName()+" "+customerSelected.getLastName());
+
+        i.putExtra("customer_id", customerSelected.getCustomerId());
+
+        startActivity(i);
+
+        onRestart();
+
+    }
+
+
+    public boolean verifyInternetAccess(){
+
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            return true;
+        }
+        else
+            return false;
+
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putInt("customer_id",customerSelected.getCustomerId());
+
+    }
+
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        int customerId= savedInstanceState.getInt("customer_id");
+        customerSelected = CustomerData.getCustomerById(customerId);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        customerToSearch2(null);
+        createAdapter();
+    }
 }

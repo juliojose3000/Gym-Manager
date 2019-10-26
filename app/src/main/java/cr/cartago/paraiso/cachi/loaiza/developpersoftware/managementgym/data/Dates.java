@@ -3,6 +3,7 @@ package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class Dates {
@@ -97,6 +98,72 @@ public class Dates {
         Calendar calendar = Calendar.getInstance();
 
         calendar.add(Calendar.DAY_OF_YEAR, 7);//Lunes
+
+        int year = calendar.get(Calendar.YEAR);
+
+        int month = calendar.get(Calendar.MONTH)+1;
+
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String date = year+"-"+month+"-"+dayOfMonth;
+
+        String dayName = getDayName(date);
+
+        String monthName = getMonthByNum(month-1);
+
+        return dayName+", "+dayOfMonth+" "+monthName+" "+year;
+
+    }
+
+    public static String getDateInAWeek(String dateX){
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        Date dat = null;
+        try {
+            dat = sdf.parse(dateX);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        Calendar calendar = Calendar. getInstance();
+
+        calendar. setTime(dat);
+
+        calendar.add(Calendar.DAY_OF_YEAR, 7);//Lunes
+
+        int year = calendar.get(Calendar.YEAR);
+
+        int month = calendar.get(Calendar.MONTH)+1;
+
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        String date = year+"-"+month+"-"+dayOfMonth;
+
+        String dayName = getDayName(date);
+
+        String monthName = getMonthByNum(month-1);
+
+        return dayName+", "+dayOfMonth+" "+monthName+" "+year;
+
+    }
+
+    public static String getDateInAMonth(String dateX){
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        Date dat = null;
+        try {
+            dat = sdf.parse(dateX);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        Calendar calendar = Calendar. getInstance();
+
+        calendar. setTime(dat);
+
+        calendar.add(Calendar.MONTH, 1);//Lunes
 
         int year = calendar.get(Calendar.YEAR);
 

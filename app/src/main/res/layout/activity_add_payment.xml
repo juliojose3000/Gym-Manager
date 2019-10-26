@@ -7,16 +7,31 @@
     tools:context=".activities.AddPayment"
     tools:layout_editor_absoluteY="73dp">
 
+    <EditText
+        android:id="@+id/editText_pay_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="59dp"
+        android:ems="10"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:hint="Fecha de pago"
+        android:inputType="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_payment_customer" />
+
     <TextView
         android:id="@+id/textView_payment_customer"
         android:layout_width="330dp"
         android:layout_height="85dp"
-        android:layout_marginEnd="27dp"
         android:layout_marginStart="27dp"
-        android:layout_marginTop="23dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="27dp"
         android:gravity="center"
         android:textSize="21sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.541"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -25,22 +40,38 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="66dp"
+        android:layout_marginTop="164dp"
         android:onClick="day"
         android:text="@string/add_day_payment"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_payment_customer" />
 
+    <TextView
+        android:id="@+id/textView_payment_details"
+        android:layout_width="248dp"
+        android:layout_height="111dp"
+        android:layout_marginStart="69dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="67dp"
+        android:gravity="left"
+        app:layout_constraintBottom_toTopOf="@+id/button_add_payment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.541"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_day_payment"
+        app:layout_constraintVertical_bias="0.0" />
+
     <Button
         android:id="@+id/button_week_payment"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="26dp"
         android:layout_marginStart="26dp"
-        android:layout_marginTop="66dp"
+        android:layout_marginTop="164dp"
+        android:layout_marginEnd="26dp"
         android:onClick="week"
         android:text="@string/add_week_payment"
         app:layout_constraintEnd_toStartOf="@+id/button_month_payment"
+        app:layout_constraintHorizontal_bias="0.55"
         app:layout_constraintStart_toEndOf="@+id/button_day_payment"
         app:layout_constraintTop_toBottomOf="@+id/textView_payment_customer" />
 
@@ -48,24 +79,12 @@
         android:id="@+id/button_month_payment"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="66dp"
+        android:layout_marginTop="164dp"
+        android:layout_marginEnd="12dp"
         android:onClick="month"
         android:text="@string/add_month_payment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_payment_customer" />
-
-    <TextView
-        android:id="@+id/textView_payment_details"
-        android:layout_width="248dp"
-        android:layout_height="111dp"
-        android:layout_marginEnd="67dp"
-        android:layout_marginStart="69dp"
-        android:layout_marginTop="51dp"
-        android:gravity="left"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_day_payment" />
 
     <Button
         android:id="@+id/button_add_payment"

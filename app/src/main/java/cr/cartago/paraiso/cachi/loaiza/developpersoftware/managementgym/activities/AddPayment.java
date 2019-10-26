@@ -2,6 +2,7 @@ package cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.activit
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +14,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,12 +23,12 @@ import org.json.JSONException;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.R;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.CustomerData;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.data.Dates;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.database.DBHelper;
-import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Customer;
 import cr.cartago.paraiso.cachi.loaiza.developpersoftware.managementgym.models.Payment;
 
 
@@ -53,6 +56,14 @@ public class AddPayment extends Activity {
 
     private ArrayList<String> listBillToPay;
 
+    private EditText payDate;
+
+    public int year, month, dayOfMonth;
+
+    private Calendar calendar;
+
+    private DatePickerDialog datePickerDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -66,23 +77,58 @@ public class AddPayment extends Activity {
 
         monthButton = findViewById(R.id.button_month_payment);
 
+        payDate = findViewById(R.id.editText_pay_date);
+
+        calendar = Calendar.getInstance();
+
+        year = calendar.get(Calendar.YEAR);
+
+        month = calendar.get(Calendar.MONTH)+1;
+
+        dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        date = new Dates();
+
+        payDate.setText(Dates.getDateForShowUser(year + "-" + month + "-" + dayOfMonth));
+
+        payDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                datePickerDialog = new DatePickerDialog(AddPayment.this,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                                payDate.setText(Dates.getDateForShowUser(year + "-" + (month+1) + "-" + dayOfMonth));
+
+                                if(monthButton.isSelected()){
+                                    month(monthButton);
+                                }
+
+                            }
+
+                        }, year, month-1, dayOfMonth);
+
+                datePickerDialog.show();
+            }
+
+        });
+
         Bundle extras = getIntent().getExtras();
 
         customerName = extras.getString("customer_name");
 
         customerId = extras.getInt("customer_id");
 
-        date = new Dates();
-
         textView_customerName = findViewById(R.id.textView_payment_customer);
 
         textView_paymentDetails = findViewById(R.id.textView_payment_details);
 
-        textView_customerName.setText("Agregar un pago a "+customerName);
+        textView_customerName.setText("Agregar un pago a " + customerName);
 
         listBillToPay = new ArrayList<>();
 
-        new AsyncTask<Void, Void, Void>(){
+        new AsyncTask<Void, Void, Void>() {
 
             @Override
             protected Void doInBackground(Void... voids) {
@@ -95,6 +141,9 @@ public class AddPayment extends Activity {
             }
 
         }.execute();
+
+        month(monthButton); //set month button as selected
+
 
     }
 
@@ -117,11 +166,13 @@ public class AddPayment extends Activity {
 
         duracion = "un dia";
 
-        startDate = date.getDateOfToday();
+        //startDate = date.getDateOfToday();
+
+        startDate = Dates.getDateForDB(payDate.getText().toString());
 
         endDate = startDate;
 
-        paymentDetails = "Cliente: "+customerName+"\nCubre hoy: "+Dates.getDateForShowUser(startDate)+"\nDuración: "+duracion;
+        paymentDetails = "Cliente: "+customerName+"\nCubre el día: "+Dates.getDateForShowUser(startDate)+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
@@ -133,12 +184,12 @@ public class AddPayment extends Activity {
 
         duracion = "una semana";
 
-        startDate = date.getDateOfToday();
+        startDate = Dates.getDateForDB(payDate.getText().toString());
 
-        endDate = date.getDateForDB(date.getDateInAWeek());
+        endDate = date.getDateForDB(date.getDateInAWeek(startDate));
 
         paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+Dates.getDateForShowUser(startDate)+
-                "\nhasta el: "+date.getDateInAWeek()+"\nDuración: "+duracion;
+                "\nhasta el: "+Dates.getDateForShowUser(endDate)+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
@@ -150,12 +201,12 @@ public class AddPayment extends Activity {
 
         duracion = "un mes";
 
-        startDate = date.getDateOfToday();
+        startDate = Dates.getDateForDB(payDate.getText().toString());
 
-        endDate = date.getDateForDB(date.getDateInAMonth());
+        endDate = date.getDateForDB(date.getDateInAMonth(startDate));
 
-        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+Dates.getDateForShowUser(date.getDateOfToday())+
-                "\nhasta el: "+date.getDateInAMonth()+"\nDuración: "+duracion;
+        paymentDetails = "Cliente: "+customerName+"\nCubre desde el: "+Dates.getDateForShowUser(startDate)+
+                "\nhasta el: "+Dates.getDateForShowUser(endDate)+"\nDuración: "+duracion;
 
         textView_paymentDetails.setText(paymentDetails);
 
@@ -169,9 +220,16 @@ public class AddPayment extends Activity {
         monthButton.setBackgroundResource(android.R.drawable.btn_default);*/
         //v.setBackgroundColor(Color.BLUE);
         dayButton.getBackground().clearColorFilter();
+        dayButton.setSelected(false);
+
         weekButton.getBackground().clearColorFilter();
+        weekButton.setSelected(false);
+
         monthButton.getBackground().clearColorFilter();
+        monthButton.setSelected(false);
+
         v.getBackground().setColorFilter(Color.CYAN, PorterDuff.Mode.MULTIPLY);
+        v.setSelected(true);
     }
 
     public void cancel(View v){
@@ -242,6 +300,7 @@ public class AddPayment extends Activity {
 
         disabilityButtons();
         Toast.makeText(this, "Se agregó el pago correctamente", Toast.LENGTH_LONG).show();
+        finish();
     }
 
 
@@ -353,25 +412,12 @@ public class AddPayment extends Activity {
 
     }
 
-    @Override
-    public void onBackPressed(){
-
-        Intent i = new Intent(AddPayment.this, Pesas.class);
-        startActivity(i);
-    }
-
     private void disabilityButtons(){
         monthButton.setEnabled(false);
         dayButton.setEnabled(false);
         weekButton.setEnabled(false);
     }
 
-
-    public class AddPaymentFromCustomer extends Thread{
-        public void run()
-        {
-        }
-    }
 
     private class Test extends AsyncTask<String, Void, Void> {
 

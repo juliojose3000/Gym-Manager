@@ -152,7 +152,7 @@ public class AddCustomer extends Activity {
 
             int customerId = DBHelper.CUSTOMERS.size()+1;
 
-            Customer customer = new Customer(customerId,name, lastname, nickname, startdate, "87349999");
+            Customer customer = new Customer(customerId,name, lastname, nickname, startdate, phoneNumber);
 
             DBHelper.CUSTOMERS.add(customer);
             DBHelper.CUSTOMERS_FOR_ADD_TODAY.add(customer);
