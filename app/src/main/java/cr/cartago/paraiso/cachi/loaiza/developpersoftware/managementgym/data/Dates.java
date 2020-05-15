@@ -132,6 +132,8 @@ public class Dates {
 
         calendar.add(Calendar.DAY_OF_YEAR, 7);//Lunes
 
+
+
         int year = calendar.get(Calendar.YEAR);
 
         int month = calendar.get(Calendar.MONTH)+1;
